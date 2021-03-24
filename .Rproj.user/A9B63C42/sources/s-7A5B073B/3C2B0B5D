@@ -1,0 +1,25 @@
+{
+    "id": "3C2B0B5D",
+    "path": "~/MyPackages/R/mrgPBPK/R/calcPcoeff.R",
+    "project_path": "R/calcPcoeff.R",
+    "type": "r_source",
+    "hash": "1204005907",
+    "contents": "",
+    "dirty": false,
+    "created": 1616467477498.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "tempName": "Untitled1",
+        "cursorPosition": "78,0",
+        "scrollLine": "69"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1616544375,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1616544375132,
+    "read_only": false,
+    "read_only_alternatives": []
+}
