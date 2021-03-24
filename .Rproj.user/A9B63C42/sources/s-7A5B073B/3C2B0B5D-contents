@@ -384,27 +384,27 @@ calcKp_pksim <- function(logP, fup, dat){
 #'
 #' Takes in the drug's physicochemical properties and returns the tissue:plasma partition coefficients
 #'
+#' @param TCData Tissue composition data
 #' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
 #' @param pKa Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule
 #' @param fup Unbound fraction of the molecule in plasma
 #' @param BP Blood:plasma concentration ratio
 #' @param type Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid); default=1
-#' @param pred Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard; default=PT
-#' @param TCdat Tissue composition data
+#' @param method Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard; default=PT
 #' @return A named list with tissue:plasma partition coefficients
 #' @export
 ## general function
-calcKp <- function(logP, pKa, fup, BP, type=1, pred="PT", TCdat){
-  if(pred=="PT"){
-    pcoeff <- calcKp_PT(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCdat)
-  }else if(pred=="Berez"){  #Berezhkovskiy
-    pcoeff <- calcKp_Berez(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCdat)
-  }else if(pred == "pksim"){  #standard PK-Sim, Willmann et al. 2008
-    pcoeff <- calcKp_pksim(logP=logP, fup=fup, dat=TCdat)
-  }else if(pred == "Schmitt"){  #Schmitt, Walter 2008
-    pcoeff <- calcKp_Schmitt(logP=logP, pKa=pKa, fup=fup, type=type, dat=TCdat)
-  }else{  #Rodgers and Rowland
-    pcoeff <- calcKp_RR(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCdat)
+calcKp <- function(TCData, logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
+  if(method=="PT"){
+    pcoeff <- calcKp_PT(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
+  }else if(method=="Berez"){  #Berezhkovskiy
+    pcoeff <- calcKp_Berez(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
+  }else if(method == "pksim"){  #standard PK-Sim, Willmann et al. 2008
+    pcoeff <- calcKp_pksim(logP=logP, fup=fup, dat=TCData)
+  }else if(method == "Schmitt"){  #Schmitt, Walter 2008
+    pcoeff <- calcKp_Schmitt(logP=logP, pKa=pKa, fup=fup, type=type, dat=TCData)
+  }else{ #Rodgers and Rowland
+    pcoeff <- calcKp_RR(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
   }
 
   return(pcoeff)

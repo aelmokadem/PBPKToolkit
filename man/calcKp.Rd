@@ -4,9 +4,11 @@
 \alias{calcKp}
 \title{Calculate partition coefficients for a molecule}
 \usage{
-calcKp(logP, pKa, fup, BP, type = 1, pred = "PT", TCdat)
+calcKp(TCData, logP, pKa = NULL, fup, BP = 1, type = 1, method = "PT")
 }
 \arguments{
+\item{TCData}{Tissue composition data}
+
 \item{logP}{Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity}
 
 \item{pKa}{Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule}
@@ -17,9 +19,7 @@ calcKp(logP, pKa, fup, BP, type = 1, pred = "PT", TCdat)
 
 \item{type}{Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid); default=1}
 
-\item{pred}{Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard; default=PT}
-
-\item{TCdat}{Tissue composition data}
+\item{method}{Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard; default=PT}
 }
 \value{
 A named list with tissue:plasma partition coefficients
