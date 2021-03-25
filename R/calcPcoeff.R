@@ -279,7 +279,6 @@ calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
   pH <- dat_all$pH
   alpha <- 1e-3  #ratio between ditribution coefficient at given pH (D) and that in neutral form (D0)
 
-
   W <- switch(type,
               #1-neutral
               0,
@@ -295,8 +294,6 @@ calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
               10^(pKa[2]-pH)+10^(pH-pKa[1]),
               #7-triprotic acid
               10^(pH-pKa[1])+10^(2*pH-pKa[1]-pKa[2])+10^(3*pH-pKa[1]-pKa[2]-pKa[3]))
-  #             #8-triprotic base
-  #             10^(pKa[1]+pKa[2]+pKa[3]-3*pH),
 
   if(type==1 | type==2 | type==4 | type==7){ # neutral, monoprotic acid, diprotic acid, triprotic acid
     K_n_l <- K_n_pl*(((1-alpha)/(1+W))+alpha)
@@ -382,22 +379,24 @@ calcKp_pksim <- function(logP, fup, dat){
 
 #' Calculate partition coefficients for a molecule
 #'
-#' Takes in the drug's physicochemical properties and returns the tissue:plasma partition coefficients
+#' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients
 #'
 #' @param TCData Tissue composition data
 #' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
 #' @param pKa Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule
 #' @param fup Unbound fraction of the molecule in plasma
 #' @param BP Blood:plasma concentration ratio
-#' @param type Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid); default=1
-#' @param method Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard; default=PT
+#' @param type Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)
+#' @param method Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard
 #' @return A named list with tissue:plasma partition coefficients
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
 #' @export
 ## general function
 calcKp <- function(TCData, logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
-  if(method=="PT"){
+  if(method == "PT"){
     pcoeff <- calcKp_PT(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
-  }else if(method=="Berez"){  #Berezhkovskiy
+  }else if(method == "Berez"){  #Berezhkovskiy
     pcoeff <- calcKp_Berez(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
   }else if(method == "pksim"){  #standard PK-Sim, Willmann et al. 2008
     pcoeff <- calcKp_pksim(logP=logP, fup=fup, dat=TCData)

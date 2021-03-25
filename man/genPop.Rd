@@ -39,10 +39,10 @@ genPop(
 
 \item{maxBMI}{Maximum body mass index}
 
-\item{optimize}{if TRUE, an optimization step is done for each individual; default is FALSE}
+\item{optimize}{if TRUE, an optimization step is done for each individual}
 }
 \value{
-Named list of lists with physiological parameters for each individual in the population
+List of named lists with physiological parameters for each individual in the population
 }
 \description{
 Takes in desired population demographics and generates the population physiological parameters

@@ -1,3 +1,12 @@
+## load databases
+nhanesData <- readRDS(system.file("genPhysData", "nhanesData.Rds", package="mrgPBPK"))  #load nhanes anthropometric data
+icrpData <- readRDS(system.file("genPhysData", "icrpParams.Rds", package="mrgPBPK"))  #load physiology data from ICRP publication 89
+SF <- readRDS(system.file("genPhysData", "allometricSF.Rds", package="mrgPBPK"))  #allometric scaling factors; source: https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
+normSD <- readRDS(system.file("genPhysData", "normalOrgansData.Rds", package="mrgPBPK"))  #normally distributed organs' sd
+lnormSD <- readRDS(system.file("genPhysData", "lnormalOrgansData.Rds", package="mrgPBPK"))  #log normally distributed organs' sd
+flow <- readRDS(system.file("genPhysData", "organBloodFlow.Rds", package="mrgPBPK"))  #organ blood flows
+BC <- readRDS(system.file("genPhysData", "organBloodCont.Rds", package="mrgPBPK"))  #organ blood content
+
 #' Generate individual physiological parameters
 #'
 #' Takes in desired individual demographics and generates the individual physiological parameters
@@ -7,23 +16,18 @@
 #' @param bw_targ Target body weight
 #' @param ht_targ Target height
 #' @param bmi_targ Target body mass index
-#' @param optimize if TRUE, an optimization step is done; default is FALSE
+#' @param optimize if TRUE, an optimization step is done
 #' @return Named list with physiological parameters for the desired individual
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr bind_rows
+#' @importFrom nloptr newuoa
 #' @export
 
-#This function generates the desired individual parameters; using linear interpolaton (PK-Sim)
+#This function generates the desired individual parameters; using linear interpolaton
 #source is mainly the PK-Sim Github page https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
-#library(tidyverse)
-#library(nloptr)
-
-##load databases
-# nhanesData <- read.csv("../data/source/dataset2.csv")  #load nhanes anthropometric data
-# icrpData <- read.csv("../data/source/icrpParams2.csv")  #load physiology data from ICRP publication 89, no separation between gut wall and lumen
-# SF <- read.csv("../data/source/allometricSF2.csv")  #allometric scaling factors; source: https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
-# normSD <- read.csv("../data/source/normalOrgansData2.csv")  #normally distributed organs' sd
-# lnormSD <- read.csv("../data/source/lnormalOrgansData.csv")  #log normally distributed organs' geometric sd
-# flow <- read.csv("../data/source/organBloodFlow2.csv")  #organ blood flows
-# BC <- read.csv("../data/source/organBloodCont2.csv")  #organ blood content
 
 genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, optimize=F){
   #nhanesData is nhanes anthropometric dataset; icrpData are physiological parameters from ICRP; SF is allomeric scaling factors
@@ -36,8 +40,8 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   ##filter nhanes database for desired age and gender
   if(is.male){
     sex <- 1
-    dat <- nhanesData %>% dplyr::filter(AGE_YR==age, SEX==sex)  #filter male nhanes data
-    df <- icrpData %>% dplyr::select(grep("_m", names(icrpData)))  #filter male physiological data
+    dat <- nhanesData %>% filter(AGE_YR==age, SEX==sex)  #filter male nhanes data
+    df <- icrpData %>% select(grep("_m", names(icrpData)))  #filter male physiological data
     names(df) <- gsub("_m", "", names(df))  #remove "_m" from df names
     normSD[,"cv_f"] <- NULL  #remove female CV column
     names(normSD) <- gsub("_m", "", names(normSD))  #remove "_m" from df names
@@ -47,8 +51,8 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
     names(BC) <- gsub("_m", "", names(BC))  #remove "_m" from df names
   }else{
     sex <- 2
-    dat <- nhanesData %>% dplyr::filter(AGE_YR==age, SEX==sex)  #filter female nhanes data
-    df <- icrpData %>% dplyr::select(grep("_f", names(icrpData)))  #filter female physiological data
+    dat <- nhanesData %>% filter(AGE_YR==age, SEX==sex)  #filter female nhanes data
+    df <- icrpData %>% select(grep("_f", names(icrpData)))  #filter female physiological data
     names(df) <- gsub("_f", "", names(df))  #remove "_f" from df names
     normSD[,"cv_m"] <- NULL  #remove female CV column
     names(normSD) <- gsub("_f", "", names(normSD))  #remove "_m" from df names
@@ -74,7 +78,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   bmi_mean <- exp(mean(log(dat$BMI)))  #geomteric mean for lognormally distributed BMI; Jim and I think this is better
 
   ##get mean physiological parameters scaled by linear interpolation with height
-  df2 <- df %>% dplyr::select(-c(bw, ht, bsa))  #get rid of anthropometric measurements
+  df2 <- df %>% select(-c(bw, ht, bsa))  #get rid of anthropometric measurements
   ht_ref <- df$ht/100  #get reference body heights from ICRP in m
   linIntFns <- apply(df2, 2, FUN=function(x) approxfun(ht_ref, x, rule=2))  #linear interpolation functions with height; if outside range use closest value
   physPars <- lapply(linIntFns, FUN=function(x) x(ht_mean))  #get list of mean physiological parameters
@@ -83,7 +87,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   df_temp <- data.frame(organ=names(physPars), means=as.numeric(physPars))  #get scaling for blood and cardiac output
   blVol <- df_temp$means[df_temp$organ == "bl"]  #extract blood volume
   df_temp <- bind_rows(df_temp, data.frame(organ=c("ve","ar"), means=c(0, 0)))  #temporarily use whole blood volume for arterial and venous blood vols
-  df_temp <- df_temp %>% dplyr::filter(organ != "bl")  #remove blood volume from df
+  df_temp <- df_temp %>% filter(organ != "bl")  #remove blood volume from df
   l_temp <- split(df_temp, df_temp$organ %in% c("co"))  #separate vols from co
   df_vols <- l_temp[["FALSE"]]
   df_co <- l_temp[["TRUE"]]
@@ -91,15 +95,15 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   ################################# getting organ volumes ##########################################
   #add blood content to vols
   df_vols <- left_join(df_vols, BC, by="organ")
-  df_vols <- df_vols %>% dplyr::mutate(means=means + (bloodPerc*blVol/100))
-  df_temp <- dplyr::bind_rows(df_vols %>% dplyr::select(organ, means), df_co)  #join with co again
+  df_vols <- df_vols %>% mutate(means=means + (bloodPerc*blVol/100))
+  df_temp <- bind_rows(df_vols %>% select(organ, means), df_co)  #join with co again
 
   normOrgan <- normSD$organ
   lnormOrgan <- lnormSD$organ
-  df_norm <- df_temp %>% dplyr::filter(organ %in% normOrgan)  #prepare a df for normally distributed organs
+  df_norm <- df_temp %>% filter(organ %in% normOrgan)  #prepare a df for normally distributed organs
   df_norm <- left_join(df_norm, normSD, by="organ")  #integrate with stds
-  df_norm <- df_norm %>% dplyr::mutate(std = cv*means/100) %>% dplyr::select(-cv)  #get standard deviations from CVs then drop it
-  df_lnorm <- df_temp %>% dplyr::filter(organ %in% lnormOrgan)  #prepare a df for lognormally distributed organs
+  df_norm <- df_norm %>% mutate(std = cv*means/100) %>% select(-cv)  #get standard deviations from CVs then drop it
+  df_lnorm <- df_temp %>% filter(organ %in% lnormOrgan)  #prepare a df for lognormally distributed organs
   df_lnorm <- left_join(df_lnorm, lnormSD, by="organ")  #integrate with stds
   names(df_lnorm)[names(df_lnorm) == "geomSD"] <- "std"  #change geomSD to std
   df3 <- bind_rows(df_norm, df_lnorm)  #get combined dataframe for normally and lognormally distributed organs
@@ -108,9 +112,9 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   ht_rel <- ht_targ/ht_mean  #get relative height ratio
   SF2 <- bind_rows(SF, data.frame(organ="co", factor=0.75))  #add allometric scaling factor for cardiac output
   df3 <- left_join(df3, SF2, by=("organ"))  #integrate allometric scaling factors
-  df3 <- df3 %>% dplyr::mutate(means_scaled = ifelse(organ %in% normOrgan, means*ht_rel^factor, means + log(ht_rel^factor)))  #get scaled mean values
-  df3 <- df3 %>% dplyr::mutate(std_scaled = ifelse(organ %in% normOrgan, std*ht_rel^factor, std))  #get scaled standard deviations
-  df4 <- df3 %>% dplyr::filter(organ != "co")  #remove cardiac output
+  df3 <- df3 %>% mutate(means_scaled = ifelse(organ %in% normOrgan, means*ht_rel^factor, means + log(ht_rel^factor)))  #get scaled mean values
+  df3 <- df3 %>% mutate(std_scaled = ifelse(organ %in% normOrgan, std*ht_rel^factor, std))  #get scaled standard deviations
+  df4 <- df3 %>% filter(organ != "co")  #remove cardiac output
 
   ######################### optimization of organ volumes #################################
   #set initial values for volumes
@@ -118,12 +122,12 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   df_opt <- l_temp[["FALSE"]]
   df_ad <- l_temp[["TRUE"]]
 
-  #df_opt <- df4 %>% dplyr::filter(organ != "ad") #remove adipose as we will not optimize for it
+  #df_opt <- df4 %>% filter(organ != "ad") #remove adipose as we will not optimize for it
   pert <- runif(1)  #perturbation to parameters
-  df_opt <- df_opt %>% dplyr::mutate(pertMeans = ifelse(organ %in% normOrgan,
+  df_opt <- df_opt %>% mutate(pertMeans = ifelse(organ %in% normOrgan,
                                                         means_scaled + std_scaled*pert,
                                                         means_scaled*exp(log(std_scaled)*pert))) %>%
-    dplyr::mutate(pertMeans = ifelse(organ == "sk", pertMeans*sqrt((bw_targ/(bw_mean*ht_rel^2))), pertMeans))#temporary fix
+    mutate(pertMeans = ifelse(organ == "sk", pertMeans*sqrt((bw_targ/(bw_mean*ht_rel^2))), pertMeans))#temporary fix
   ad <- bw_targ - sum(df_opt$pertMeans) #compute adipose volume by subtracting current weight from target bw_targ
   p_ad <- plnorm(ad, meanlog=log(df_ad$means_scaled), sdlog=log(df_ad$std_scaled))  #compute prob for adipose vol
 
@@ -135,10 +139,10 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
     ad <- bw_targ - sum(df_opt$pertMeans)
     p_ad <- dlnorm(ad, meanlog=log(df_ad$means_scaled), sdlog=log(df_ad$std_scaled))
     skFactor <- sqrt(bw_targ/(bw_mean*ht_rel^2))
-    df_opt <- df_opt %>% dplyr::mutate(means_scaled = ifelse(organ %in% c("sk"),
+    df_opt <- df_opt %>% mutate(means_scaled = ifelse(organ %in% c("sk"),
                                                              means_scaled + skFactor,
                                                              means_scaled)) #get a new distribution for skin
-    df_opt <- suppressWarnings(df_opt %>% dplyr::mutate(probs = ifelse(organ %in% normOrgan, dnorm(optVols, mean=means_scaled, sd=std_scaled),
+    df_opt <- suppressWarnings(df_opt %>% mutate(probs = ifelse(organ %in% normOrgan, dnorm(optVols, mean=means_scaled, sd=std_scaled),
                                                                        dlnorm(optVols, meanlog=log(means_scaled), sdlog=log(std_scaled))))) #needs to change
     p <- -sum(c(log(df_opt$probs), log(p_ad)))  #optimize for the negative log probability because we want to maximize not minimize
 
@@ -146,10 +150,10 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   }
 
   if(isTRUE(optimize)){
-    optMod <- suppressWarnings(nloptr::newuoa(optVols, optimVols))
-    df_opt <- df_opt %>% dplyr::mutate(optimized=optMod$par)
+    optMod <- suppressWarnings(newuoa(optVols, optimVols))
+    df_opt <- df_opt %>% mutate(optimized=optMod$par)
   }else{
-    df_opt <- df_opt %>% dplyr::mutate(optimized=means_scaled)
+    df_opt <- df_opt %>% mutate(optimized=means_scaled)
   }
 
   ad <- bw_targ - sum(df_opt$optimized)
@@ -162,9 +166,9 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 
   ################################# getting organ blood flows #####################################
   co <- df3$means_scaled[df3$organ == "co"]
-  flow2 <- flow %>% dplyr::mutate(bfs = (flowPerc*co/100)*60) %>% dplyr::filter(!organ %in% c("ve","ar","lu","li")) #get flow rates in L/h and remove lungs, liver, arterial and venous blood flows as they will be calculated within the model
+  flow2 <- flow %>% mutate(bfs = (flowPerc*co/100)*60) %>% filter(!organ %in% c("ve","ar","lu","li")) #get flow rates in L/h and remove lungs, liver, arterial and venous blood flows as they will be calculated within the model
   flow2 <- flow2 %>%
-    dplyr::mutate(sds = 0.05*bfs,
+    mutate(sds = 0.05*bfs,
                   bfs2 = rnorm(nrow(flow2), mean=bfs, sd=sds))
   l_bf <- as.list(flow2$bfs2)  #list of blood flows
   names(l_bf) <- paste("Q", flow2$organ, sep="")  #name the list
@@ -190,8 +194,13 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #' @param maxHT Maximum height
 #' @param minBMI Minimum body mass index
 #' @param maxBMI Maximum body mass index
-#' @param optimize if TRUE, an optimization step is done for each individual; default is FALSE
-#' @return Named list of lists with physiological parameters for each individual in the population
+#' @param optimize if TRUE, an optimization step is done for each individual
+#' @return List of named lists with physiological parameters for each individual in the population
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr bind_rows
 #' @export
 #This function generates the desired individual parameters. It takes in the model (mod), number of subjects (n), ranges for age, height
 #and weight and and the percentage of females in the population
@@ -215,7 +224,7 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
 
       age <- round(runif(1, minAge, maxAge))
       is.male <- TRUE
-      dat <- nhanesData %>% dplyr::filter(AGE_YR == age & SEX == 1)
+      dat <- nhanesData %>% filter(AGE_YR == age & SEX == 1)
 
       if(is.null(minBMI)){
         bw_targ <- urlnorm(1, meanlog=mean(log(dat$BW)), sdlog=sd(log(dat$BW)), lb=minBW, ub=maxBW)
@@ -251,7 +260,7 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
     while(is.na(vol_test)){
       age <- round(runif(1, minAge, maxAge))
       is.male <- FALSE
-      dat <- nhanesData %>% dplyr::filter(AGE_YR == age & SEX == 2)
+      dat <- nhanesData %>% filter(AGE_YR == age & SEX == 2)
 
       if(is.null(minBMI)){
         bw_targ <- urlnorm(1, meanlog=mean(log(dat$BW)), sdlog=sd(log(dat$BW)), lb=minBW, ub=maxBW)

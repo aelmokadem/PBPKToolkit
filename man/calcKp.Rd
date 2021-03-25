@@ -17,13 +17,13 @@ calcKp(TCData, logP, pKa = NULL, fup, BP = 1, type = 1, method = "PT")
 
 \item{BP}{Blood:plasma concentration ratio}
 
-\item{type}{Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid); default=1}
+\item{type}{Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)}
 
-\item{method}{Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard; default=PT}
+\item{method}{Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard}
 }
 \value{
 A named list with tissue:plasma partition coefficients
 }
 \description{
-Takes in the drug's physicochemical properties and returns the tissue:plasma partition coefficients
+Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients
 }
