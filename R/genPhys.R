@@ -206,8 +206,6 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #' @export
 #This function generates the desired individual parameters. It takes in the model (mod), number of subjects (n), ranges for age, height
 #and weight and and the percentage of females in the population
-#library(tidyverse)
-#library(Runuran)
 
 genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=F){
 
