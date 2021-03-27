@@ -1,5 +1,7 @@
 #This function generates a list of the desired partition coefficients
-#library(dplyr)
+
+## load tissue composition data
+TCData <- readRDS(system.file("calcPcoeffData", "unified_tissue_comp.Rds", package="mrgPBPK"))  #organ blood content
 
 ## Poulin and Theil
 
@@ -393,7 +395,7 @@ calcKp_pksim <- function(logP, fup, dat){
 #' @importFrom dplyr filter
 #' @export
 ## general function
-calcKp <- function(TCData, logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
+calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
   if(method == "PT"){
     pcoeff <- calcKp_PT(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
   }else if(method == "Berez"){  #Berezhkovskiy

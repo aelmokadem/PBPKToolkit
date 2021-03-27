@@ -1,6 +1,7 @@
 ---
 title: "Tutorial"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,6 +15,68 @@ knitr::opts_chunk$set(
 )
 ```
 
+This vignette shows the user how to use the main `mrgPBPK` package functions:
+
+- `calcKp`: to calculate tissue:plasma partition coefficients for a molecule
+- `genInd`: to generate individual physiological parameters
+- `genPop`: to generate population physiological parameters
+
+# Load libraries
+
 ```{r setup}
 library(mrgPBPK)
+library(dplyr)
+```
+
+# Calculate tissue:plasma partition coefficients
+
+```{r}
+# define molecule's physicochemical properties
+logP <- 2
+pKa <- 1
+type <- 3
+BP <- 1
+fup <- 0.5
+method <- "PT"
+
+# calculate partition coefficients
+Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
+df_Kps <- bind_rows(Kps)
+df_Kps
+```
+
+# Generate individual physiological parameters
+
+```{r}
+# define the individual demographics
+## You only need to define two of the three covariates: body weight, height, and BMI
+age <- 30
+ismale <- T
+bw <- 73
+ht <- 1.7
+
+# generate physiological parameters
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht)
+df_indPars <- bind_rows(indPars)
+df_indPars
+```
+
+# Generate population physiological parameters
+
+```{r}
+# define the individual demographics
+## You only need to define two of the three covariates: body weight, height, and BMI
+nSubj <- 10  #number of subjects
+minAge <- 20  #minimum age
+maxAge <- 80  #maximum age
+femPerc <- 50  #percentage of females
+minBW <- 50
+maxBW <- 100
+minHT <- 1.5  #minimum height 1.5
+maxHT <- 1.9  #maximum height 1.9
+
+# # generate physiological parameters
+popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT)
+df_popPars <- bind_rows(popPars) %>% select(ID, everything())
+df_popPars
 ```

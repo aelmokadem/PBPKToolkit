@@ -23,6 +23,7 @@ BC <- readRDS(system.file("genPhysData", "organBloodCont.Rds", package="mrgPBPK"
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @importFrom dplyr bind_rows
+#' @importFrom dplyr left_join
 #' @importFrom nloptr newuoa
 #' @export
 
@@ -201,6 +202,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @importFrom dplyr bind_rows
+#' @importFrom truncnorm rtruncnorm
 #' @export
 #This function generates the desired individual parameters. It takes in the model (mod), number of subjects (n), ranges for age, height
 #and weight and and the percentage of females in the population
@@ -216,75 +218,72 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
   pars_f <- rep(list(), nFemale)
 
   ind <- 1
-  while(ind <= nMale){
+  counter <- 1
+  while(ind <= nMale & counter <= 100){
 
-    # test for failed subjects to resample
-    vol_test <- NA
-    while(is.na(vol_test)){
+    age <- round(runif(1, minAge, maxAge))
+    is.male <- TRUE
+    dat <- nhanesData %>% dplyr::filter(AGE_YR == age & SEX == 1)
 
-      age <- round(runif(1, minAge, maxAge))
-      is.male <- TRUE
-      dat <- nhanesData %>% filter(AGE_YR == age & SEX == 1)
-
-      if(is.null(minBMI)){
-        bw_targ <- urlnorm(1, meanlog=mean(log(dat$BW)), sdlog=sd(log(dat$BW)), lb=minBW, ub=maxBW)
-        ht_targ <- urnorm(1, mean=mean(dat$HT/100), sd=sd(dat$HT/100), lb=minHT, ub=maxHT)
-        bmi_targ <- bw_targ/ht_targ^2
-      }else if(is.null(minHT)){
-        bw_targ <- urlnorm(1, meanlog=mean(log(dat$BW)), sdlog=sd(log(dat$BW)), lb=minBW, ub=maxBW)
-        bmi_targ <- urlnorm(1, meanlog=mean(log(dat$BMI)), sdlog=sd(log(dat$BMI)), lb=minBMI, ub=maxBMI)
-        ht_targ <- sqrt(bw_targ/bmi_targ)
-      }else{
-        ## the final option is same as is.null(minBW) since we can't independently sample the 3 covs but 1 has to be derived from the others and I chose weight
-        bmi_targ <- urlnorm(1, meanlog=mean(log(dat$BMI)), sdlog=sd(log(dat$BMI)), lb=minBMI, ub=maxBMI)
-        ht_targ <- urnorm(1, mean=mean(dat$HT/100), sd=sd(dat$HT/100), lb=minHT, ub=maxHT)
-        bw_targ <- bmi_targ*ht_targ^2
-      }
-
-      t <- try(pars_m[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize))  #get the individual parameters
-      vol_test <- 1
+    if(is.null(minBMI)){
+      bw_targ <- exp(rtruncnorm(1, a=log(minBW), b=log(maxBW), mean=mean(log(dat$BW)), sd=sd(log(dat$BW))))
+      ht_targ <- exp(rtruncnorm(1, a=log(minHT), b=log(maxHT), mean=mean(log(dat$HT/100)), sd=sd(log(dat$HT/100))))
+      bmi_targ <- bw_targ/ht_targ^2
+    }else if(is.null(minHT)){
+      bw_targ <- exp(rtruncnorm(1, a=log(minBW), b=log(maxBW), mean=mean(log(dat$BW)), sd=sd(log(dat$BW))))
+      bmi_targ <- exp(rtruncnorm(1, a=log(minBMI), b=log(maxBMI), mean=mean(log(dat$BMI)), sd=sd(log(dat$BMI))))
+      ht_targ <- sqrt(bw_targ/bmi_targ)
+    }else{
+      ## the final option is same as is.null(minBW) since we can't independently sample the 3 covs but 1 has to be derived from the others and I chose weight
+      bmi_targ <- exp(rtruncnorm(1, a=log(minBMI), b=log(maxBMI), mean=mean(log(dat$BMI)), sd=sd(log(dat$BMI))))
+      ht_targ <- exp(rtruncnorm(1, a=log(minHT), b=log(maxHT), mean=mean(log(dat$HT/100)), sd=sd(log(dat$HT/100))))
+      bw_targ <- bmi_targ*ht_targ^2
     }
+
+    t <- try(pars_m[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize))  #get the individual parameters
 
     if("try-error" %in% class(t)){
       ind <- ind
+      counter <- counter + 1
     }else{
       ind <- ind + 1
+      counter <- 1
     }
   }
 
   ind <- 1
-  while(ind <= nFemale){
+  counter <- 1
+  while(ind <= nFemale & counter <= 100){
 
     # test for failed subjects to resample
     vol_test <- NA
-    while(is.na(vol_test)){
-      age <- round(runif(1, minAge, maxAge))
-      is.male <- FALSE
-      dat <- nhanesData %>% filter(AGE_YR == age & SEX == 2)
+    age <- round(runif(1, minAge, maxAge))
+    is.male <- FALSE
+    dat <- nhanesData %>% dplyr::filter(AGE_YR == age & SEX == 2)
 
-      if(is.null(minBMI)){
-        bw_targ <- urlnorm(1, meanlog=mean(log(dat$BW)), sdlog=sd(log(dat$BW)), lb=minBW, ub=maxBW)
-        ht_targ <- urnorm(1, mean=mean(dat$HT/100), sd=sd(dat$HT/100), lb=minHT, ub=maxHT)
-        bmi_targ <- bw_targ/ht_targ^2
-      }else if(is.null(minHT)){
-        bw_targ <- urlnorm(1, meanlog=mean(log(dat$BW)), sdlog=sd(log(dat$BW)), lb=minBW, ub=maxBW)
-        bmi_targ <- urlnorm(1, meanlog=mean(log(dat$BMI)), sdlog=sd(log(dat$BMI)), lb=minBMI, ub=maxBMI)
-        ht_targ <- sqrt(bw_targ/bmi_targ)
-      }else{
-        ## the final option is same as is.null(minBW) since we can't independently sample the 3 covs but 1 has to be derived from the others and I chose weight
-        bmi_targ <- urlnorm(1, meanlog=mean(log(dat$BMI)), sdlog=sd(log(dat$BMI)), lb=minBMI, ub=maxBMI)
-        ht_targ <- urnorm(1, mean=mean(dat$HT/100), sd=sd(dat$HT/100), lb=minHT, ub=maxHT)
-        bw_targ <- bmi_targ*ht_targ^2
-      }
-
-      t <- try(pars_f[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize))  #get the individual parameters and get error if input out of range and try again
-      vol_test <- 1
+    if(is.null(minBMI)){
+      bw_targ <- exp(rtruncnorm(1, a=log(minBW), b=log(maxBW), mean=mean(log(dat$BW)), sd=sd(log(dat$BW))))
+      ht_targ <- exp(rtruncnorm(1, a=log(minHT), b=log(maxHT), mean=mean(log(dat$HT/100)), sd=sd(log(dat$HT/100))))
+      bmi_targ <- bw_targ/ht_targ^2
+    }else if(is.null(minHT)){
+      bw_targ <- exp(rtruncnorm(1, a=log(minBW), b=log(maxBW), mean=mean(log(dat$BW)), sd=sd(log(dat$BW))))
+      bmi_targ <- exp(rtruncnorm(1, a=log(minBMI), b=log(maxBMI), mean=mean(log(dat$BMI)), sd=sd(log(dat$BMI))))
+      ht_targ <- sqrt(bw_targ/bmi_targ)
+    }else{
+      ## the final option is same as is.null(minBW) since we can't independently sample the 3 covs but 1 has to be derived from the others and I chose weight
+      bmi_targ <- exp(rtruncnorm(1, a=log(minBMI), b=log(maxBMI), mean=mean(log(dat$BMI)), sd=sd(log(dat$BMI))))
+      ht_targ <- exp(rtruncnorm(1, a=log(minHT), b=log(maxHT), mean=mean(log(dat$HT/100)), sd=sd(log(dat$HT/100))))
+      bw_targ <- bmi_targ*ht_targ^2
     }
+
+    t <- try(pars_f[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize))  #get the individual parameters and get error if input out of range and try again
 
     if("try-error" %in% class(t)){
       ind <- ind
+      counter <- counter + 1
     }else{
       ind <- ind + 1
+      counter <- 1
     }
   }
 
