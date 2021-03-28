@@ -383,7 +383,6 @@ calcKp_pksim <- function(logP, fup, dat){
 #'
 #' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients
 #'
-#' @param TCData Tissue composition data
 #' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
 #' @param pKa Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule
 #' @param fup Unbound fraction of the molecule in plasma

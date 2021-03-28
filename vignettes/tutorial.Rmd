@@ -32,12 +32,12 @@ library(dplyr)
 
 ```{r}
 # define molecule's physicochemical properties
-logP <- 2
-pKa <- 1
-type <- 3
-BP <- 1
-fup <- 0.5
-method <- "PT"
+logP <- 2  #lipophilicity
+pKa <- 1  #acidic strength
+type <- 3  #type of molecule
+BP <- 1  #blood:plasma concentration ratio
+fup <- 0.5  #unbound fraction in plasma
+method <- "PT"  #prediction method
 
 # calculate partition coefficients
 Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
@@ -55,7 +55,7 @@ ismale <- T
 bw <- 73
 ht <- 1.7
 
-# generate physiological parameters
+# generate individual physiological parameters
 indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht)
 df_indPars <- bind_rows(indPars)
 df_indPars
@@ -64,18 +64,18 @@ df_indPars
 # Generate population physiological parameters
 
 ```{r}
-# define the individual demographics
-## You only need to define two of the three covariates: body weight, height, and BMI
+# define the population demographics
+## You only need to define the range for two of the three covariates: body weight, height, and BMI
 nSubj <- 10  #number of subjects
 minAge <- 20  #minimum age
 maxAge <- 80  #maximum age
 femPerc <- 50  #percentage of females
-minBW <- 50
-maxBW <- 100
-minHT <- 1.5  #minimum height 1.5
-maxHT <- 1.9  #maximum height 1.9
+minBW <- 50  #minimum body weight
+maxBW <- 100  #maximum body weight
+minHT <- 1.5  #minimum height
+maxHT <- 1.9  #maximum height
 
-# # generate physiological parameters
+# generate population physiological parameters
 popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT)
 df_popPars <- bind_rows(popPars) %>% select(ID, everything())
 df_popPars

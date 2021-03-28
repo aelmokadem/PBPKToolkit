@@ -18,8 +18,6 @@ calcKp(logP, pKa = NULL, fup, BP = 1, type = 1, method = "PT")
 \item{type}{Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)}
 
 \item{method}{Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard}
-
-\item{TCData}{Tissue composition data}
 }
 \value{
 A named list with tissue:plasma partition coefficients
