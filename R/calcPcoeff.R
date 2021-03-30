@@ -5,9 +5,20 @@ TCData <- readRDS(system.file("calcPcoeffData", "unified_tissue_comp.Rds", packa
 
 ## Poulin and Theil
 
-#calculate tissue:plasma partition coefficients based on: Poulin and Theil http://jpharmsci.org/article/S0022-3549(16)30889-9/fulltext
-#the function returns a list of parameters that can be used directly to update the param() function in mrgsolve
-
+#' Calculate partition coefficients for a molecule based on the Poulin and Theil method
+#'
+#' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Poulin and Theil method
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param pKa Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule
+#' @param fup Unbound fraction of the molecule in plasma
+#' @param BP Blood:plasma concentration ratio
+#' @param type Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)
+#' @param dat Dataframe containing tissue composition data; columns are: tissue, f_water=water fraction, f_lipids=lipids fraction, f_proteins=protein fraction, f_pl=phospholipids fraction, f_n_l=neutral lipids fraction, f_n_pl=neutral phospholipids fraction, f_a_pl=acidic phospholipids fraction, pH, f_ew=extracellular fraction, f_iw=intracellular fraction, AR, LR  Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard
+#' @return A named list with tissue:plasma partition coefficients
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @keywords internal
 calcKp_PT <- function(logP, pKa, fup, BP=1, type=1, dat){
 
   dat_all <- dat %>% filter(!tissue %in% c("Plasma","Adipose","RBCs"))
@@ -74,16 +85,26 @@ calcKp_PT <- function(logP, pKa, fup, BP=1, type=1, dat){
 
 ## Rodgers and Rowland
 
-#calculate tissue:plasma partition coefficients based on: Rodgers and Rowland http://jpharmsci.org/article/S0022-3549(16)31789-0/fulltext and http://jpharmsci.org/article/S0022-3549(16)32034-2/fulltext
-#tissue data are derived from rats
-
-calcKp_RR <- function(logP, pKa=0, fup, BP=1, type=1, dat){
+#' Calculate partition coefficients for a molecule based on the Rodgers and Rowland method
+#'
+#' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Rodgers and Rowland method
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param pKa Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule
+#' @param fup Unbound fraction of the molecule in plasma
+#' @param BP Blood:plasma concentration ratio
+#' @param type Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)
+#' @param dat Dataframe containing tissue composition data; columns are: tissue, f_water=water fraction, f_lipids=lipids fraction, f_proteins=protein fraction, f_pl=phospholipids fraction, f_n_l=neutral lipids fraction, f_n_pl=neutral phospholipids fraction, f_a_pl=acidic phospholipids fraction, pH, f_ew=extracellular fraction, f_iw=intracellular fraction, AR, LR  Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard
+#' @return A named list with tissue:plasma partition coefficients
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @keywords internal
+calcKp_RR <- function(logP, pKa, fup, BP=1, type=1, dat){
 
   dat_all <- dat %>% filter(!tissue %in% c("RBCs", "Adipose", "Plasma"))  #df for all tissues except for adipose, RBCs, and plasma
   dat_ad <- dat %>% filter(tissue == "Adipose")  #df for adipose
   dat_rbc <- dat %>% filter(tissue == "RBCs") #df for RBCs
   dat_plas <- dat %>% filter(tissue == "Plasma") #df for aplasma
-
 
   pH_IW <- 7       #pH of intracellular tissue water
   pH_P <- 7.4      #pH of plasma
@@ -197,9 +218,20 @@ calcKp_RR <- function(logP, pKa=0, fup, BP=1, type=1, dat){
 
 ## Berezhkovskiy
 
-#calculate tissue:plasma partition coefficients based on BEREZHKOVSKIY, LEONID M. (2004) equations
-#the function returns a list of parameters that can be used directly to update the param() function in mrgsolve
-
+#' Calculate partition coefficients for a molecule based on the Berezhkovskiy method
+#'
+#' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Berezhkovskiy method
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param pKa Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule
+#' @param fup Unbound fraction of the molecule in plasma
+#' @param BP Blood:plasma concentration ratio
+#' @param type Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)
+#' @param dat Dataframe containing tissue composition data; columns are: tissue, f_water=water fraction, f_lipids=lipids fraction, f_proteins=protein fraction, f_pl=phospholipids fraction, f_n_l=neutral lipids fraction, f_n_pl=neutral phospholipids fraction, f_a_pl=acidic phospholipids fraction, pH, f_ew=extracellular fraction, f_iw=intracellular fraction, AR, LR  Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard
+#' @return A named list with tissue:plasma partition coefficients
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @keywords internal
 calcKp_Berez <- function(logP, pKa, fup, BP=1, type=1, dat){
 
   dat_all <- dat %>% filter(!tissue %in% c("Plasma","Adipose","RBCs"))
@@ -267,8 +299,19 @@ calcKp_Berez <- function(logP, pKa, fup, BP=1, type=1, dat){
 
 ## Schmitt
 
-#This function calculates tissue:plasma partition coefficients according to Schmitt https://www.sciencedirect.com/science/article/pii/S0887233307002573?via%3Dihub
-
+#' Calculate partition coefficients for a molecule based on the Schmitt method
+#'
+#' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Schmitt method
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param pKa Negative log of the acid dissociation constant; measurement of the acidic strength of the molecule
+#' @param fup Unbound fraction of the molecule in plasma
+#' @param type Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)
+#' @param dat Dataframe containing tissue composition data; columns are: tissue, f_water=water fraction, f_lipids=lipids fraction, f_proteins=protein fraction, f_pl=phospholipids fraction, f_n_l=neutral lipids fraction, f_n_pl=neutral phospholipids fraction, f_a_pl=acidic phospholipids fraction, pH, f_ew=extracellular fraction, f_iw=intracellular fraction, AR, LR  Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard
+#' @return A named list with tissue:plasma partition coefficients
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @keywords internal
 calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
   #logMA is the log of membrane affinity = phosphatidylcholine:water (neutral phospholipid:water) partition coefficient;
   #we can use the available measurement of lipophilicity instead (logP or logD); from Schmitt, Walter (2008)
@@ -354,8 +397,17 @@ calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
 
 ## PK-Sim Standard
 
-#This function calculates the tissue:plasma partition coefficients according to PK-Sim https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159
-
+#' Calculate partition coefficients for a molecule based on the PK_Sim method
+#'
+#' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the PK-Sim method
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param fup Unbound fraction of the molecule in plasma
+#' @param dat Dataframe containing tissue composition data; columns are: tissue, f_water=water fraction, f_lipids=lipids fraction, f_proteins=protein fraction, f_pl=phospholipids fraction, f_n_l=neutral lipids fraction, f_n_pl=neutral phospholipids fraction, f_a_pl=acidic phospholipids fraction, pH, f_ew=extracellular fraction, f_iw=intracellular fraction, AR, LR  Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard
+#' @return A named list with tissue:plasma partition coefficients
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @keywords internal
 calcKp_pksim <- function(logP, fup, dat){
   #logMA is the log of membrane affinity = phosphatidylcholin:water (neutral phospholipid:water) partition coefficient;
   #we can use the available measurement of lipophilicity instead (logP or logD); from Schmitt, Walter (2008)
