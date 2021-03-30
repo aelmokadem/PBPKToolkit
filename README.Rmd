@@ -2,16 +2,9 @@
 output: github_document
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
 # Load libraries
 
-```{r setup}
+```{r setup, warning=FALSE, message=FALSE}
 library(mrgPBPK)
 library(dplyr)
 ```
