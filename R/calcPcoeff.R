@@ -306,7 +306,7 @@ calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
     pcoeff <- calcKp_RR(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
   }
 
-  test_NegativeKps(pcoeffs)
+  test_NegativeKps(pcoeff)
 
   return(pcoeff)
 }

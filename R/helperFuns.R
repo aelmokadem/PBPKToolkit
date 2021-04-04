@@ -285,5 +285,50 @@ test_NegativeKps <- function(Kps){
 #### Helper functions for genPhys ####
 ######################################
 
+#' Get missing covariate
+#'
+#' Takes in the target covariates and returns them after calculating the missing one
+#'
+#' @param bw_targ Target body weight
+#' @param ht_targ Target height
+#' @param bmi_targ Target BMI
+#' @return A named list of target covariates
+#' @keywords internal
+testCovRange <- function(bw_targ, ht_targ, bmi_targ){
+  if(is.null(bmi_targ)) bmi_targ <- bw_targ/ht_targ^2
+  if(is.null(bw_targ)) bw_targ <- bmi_targ*ht_targ^2
+  if(is.null(ht_targ)) ht_targ <- sqrt(bw_targ/bmi_targ)
+
+  l <- list(bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ)
+  return(l)
+}
+
+##################################
+
+#' Test if the target covariates are out of range
+#'
+#' Takes in the target covariates and corresponding ranges for the chosen age and gender and returns an error if one or more are out of range
+#'
+#' @param bw_targ Target body weight
+#' @param ht_targ Target height
+#' @param bmi_targ Target BMI
+#' @param rangeBW Range of body weights for the chosen age and gender
+#' @param rangeHT Range of heights for the chosen age and gender
+#' @param rangeBW Range of BMIs for the chosen age and gender
+#' @return An error message if one or more of the covariates are out of range
+#' @keywords internal
+testCovRange <- function(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI){
+  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target body weight, height, and BMI are out of range for the chosen age and gender")
+  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (ht_targ < rangeHT[1] || ht_targ > rangeHT[2])) stop("Target body weight and height are out of range for the chosen age and gender")
+  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target body weight and BMI are out of range for the chosen age and gender")
+  if((ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target height and BMI are out of range for the chosen age and gender")
+  if(bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) stop("Target body weight is out of range for the chosen age and gender")
+  if(ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) stop("Target height is out of range for the chosen age and gender")
+  if(bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2]) stop("Target BMI is out of range for the chosen age and gender")
+}
+
+######################################
+
+
 ######################################
 ######################################

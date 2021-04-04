@@ -68,10 +68,8 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   rangeHT <- quantile(dat$HT/100, c(0.025, 0.975))  #get the 95% range of heights
   rangeBMI <- quantile(dat$BMI, c(0.025, 0.975))  #get the 95% range of body mass index
 
-  #throw error when target measurements are out of range
-  if (bw_targ < rangeBW[1] || bw_targ > rangeBW[2] || ht_targ < rangeHT[1] || ht_targ > rangeHT[2] || bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2]){
-    stop("Input values are out of range")
-  }
+  #throw covariate range and throw an error when target measurements are out of range
+  testCovRange(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI)
 
   ##get mean bw, ht and bmi
   bw_mean <- exp(mean(log(dat$BW)))  #geomteric mean for lognormally distributed weights
