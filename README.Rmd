@@ -34,10 +34,10 @@ df_Kps
 age <- 30
 ismale <- T
 bw <- 73
-ht <- 1.7
+ht <- 1.76
 
 # generate individual physiological parameters
-indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht)
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize=TRUE)
 df_indPars <- bind_rows(indPars)
 df_indPars
 ```

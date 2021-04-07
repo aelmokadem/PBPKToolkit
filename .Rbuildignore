@@ -1,2 +1,12 @@
+^renv$
+^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
+^.drone.yml$
+^README\.Rmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^pkgr\.yml$
+^data-raw$

@@ -4,7 +4,7 @@ Title: PBPK Framework
 Version: 0.1.0
 Author: Ahmed Elmokadem <ahmede@metrumrg.com>
 Maintainer: Ahmed Elmokadem <ahmede@metrumrg.com>
-Description: Helper Functions for PBPK Modeling
+Description: Helper Functions for PBPK Modeling.
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true

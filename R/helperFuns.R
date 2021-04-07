@@ -274,7 +274,7 @@ test_pKaTypeMatch <- function(type, pKa){
 #' @param Kps Named list with Kp values
 #' @return An error if one or more Kp values is < 0
 #' @keywords internal
-test_NegativeKps <- function(Kps){
+test_negativeKps <- function(Kps){
   if(any(as.numeric(Kps) < 0)) stop("One or more partition coefficients have values < 0. Make sure the input parameters are correct or use a different method")
 }
 
@@ -285,49 +285,94 @@ test_NegativeKps <- function(Kps){
 #### Helper functions for genPhys ####
 ######################################
 
-#' Get missing covariate
-#'
-#' Takes in the target covariates and returns them after calculating the missing one
-#'
-#' @param bw_targ Target body weight
-#' @param ht_targ Target height
-#' @param bmi_targ Target BMI
-#' @return A named list of target covariates
-#' @keywords internal
-testCovRange <- function(bw_targ, ht_targ, bmi_targ){
-  if(is.null(bmi_targ)) bmi_targ <- bw_targ/ht_targ^2
-  if(is.null(bw_targ)) bw_targ <- bmi_targ*ht_targ^2
-  if(is.null(ht_targ)) ht_targ <- sqrt(bw_targ/bmi_targ)
-
-  l <- list(bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ)
-  return(l)
-}
-
-##################################
-
 #' Test if the target covariates are out of range
 #'
-#' Takes in the target covariates and corresponding ranges for the chosen age and gender and returns an error if one or more are out of range
+#' Takes in the target covariates and corresponding ranges for the chosen age and sex and returns an error if one or more are out of range
 #'
 #' @param bw_targ Target body weight
 #' @param ht_targ Target height
 #' @param bmi_targ Target BMI
-#' @param rangeBW Range of body weights for the chosen age and gender
-#' @param rangeHT Range of heights for the chosen age and gender
-#' @param rangeBW Range of BMIs for the chosen age and gender
+#' @param rangeBW Range of body weights for the chosen age and sex
+#' @param rangeHT Range of heights for the chosen age and sex
+#' @param rangeBW Range of BMIs for the chosen age and sex
 #' @return An error message if one or more of the covariates are out of range
 #' @keywords internal
-testCovRange <- function(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI){
-  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target body weight, height, and BMI are out of range for the chosen age and gender")
-  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (ht_targ < rangeHT[1] || ht_targ > rangeHT[2])) stop("Target body weight and height are out of range for the chosen age and gender")
-  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target body weight and BMI are out of range for the chosen age and gender")
-  if((ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target height and BMI are out of range for the chosen age and gender")
-  if(bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) stop("Target body weight is out of range for the chosen age and gender")
-  if(ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) stop("Target height is out of range for the chosen age and gender")
-  if(bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2]) stop("Target BMI is out of range for the chosen age and gender")
+test_covRange <- function(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI){
+  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target body weight, height, and BMI are out of range for the chosen age and sex")
+  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (ht_targ < rangeHT[1] || ht_targ > rangeHT[2])) stop("Target body weight and height are out of range for the chosen age and sex")
+  if((bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target body weight and BMI are out of range for the chosen age and sex")
+  if((ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) & (bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2])) stop("Target height and BMI are out of range for the chosen age and sex")
+  if(bw_targ < rangeBW[1] || bw_targ > rangeBW[2]) stop("Target body weight is out of range for the chosen age and sex")
+  if(ht_targ < rangeHT[1] || ht_targ > rangeHT[2]) stop("Target height is out of range for the chosen age and sex")
+  if(bmi_targ < rangeBMI[1] || bmi_targ > rangeBMI[2]) stop("Target BMI is out of range for the chosen age and sex")
 }
 
 ######################################
+
+#' Refine datasets based on age and sex
+#'
+#' Takes in the target age and sex and returns a list of datasets refined based on these covariates
+#'
+#' @param age Age
+#' @param sex Sex
+#' @return A named list with the refined datasets based on age and sex
+#' @keywords internal
+filterDatasets <- function(age, sex){
+  if(sex == 1){
+    dat <- nhanesData %>% filter(AGE_YR==age, SEX==sex)  #filter male nhanes data
+    df <- icrpData %>% select(grep("_m", names(icrpData)))  #filter male physiological data
+    names(df) <- gsub("_m", "", names(df))  #remove "_m" from df names
+    normSD[,"cv_f"] <- NULL  #remove female CV column
+    names(normSD) <- gsub("_m", "", names(normSD))  #remove "_m" from df names
+    flow[,"flowPerc_f"] <- NULL  #remove female flows column
+    names(flow) <- gsub("_m", "", names(flow))  #remove "_m" from df names
+    BC[,"bloodPerc_f"] <- NULL  #remove female blood content column
+    names(BC) <- gsub("_m", "", names(BC))  #remove "_m" from df names
+  }else{
+    dat <- nhanesData %>% filter(AGE_YR==age, SEX==sex)  #filter female nhanes data
+    df <- icrpData %>% select(grep("_f", names(icrpData)))  #filter female physiological data
+    names(df) <- gsub("_f", "", names(df))  #remove "_f" from df names
+    normSD[,"cv_m"] <- NULL  #remove female CV column
+    names(normSD) <- gsub("_f", "", names(normSD))  #remove "_m" from df names
+    flow[,"flowPerc_m"] <- NULL  #remove male flows column
+    names(flow) <- gsub("_f", "", names(flow))  #remove "_m" from df names
+    BC[,"bloodPerc_m"] <- NULL  #remove male blood content column
+    names(BC) <- gsub("_f", "", names(BC))  #remove "_f" from df names
+  }
+
+  l <- list(dat=dat, df=df, normSD=normSD, flow=flow, BC=BC)
+  return(l)
+}
+
+######################################
+
+#' Optimize organ volumes
+#'
+#' Takes in the a vector of non-optimized organ volumes and returns a probability to be minimized by an optimizer
+#'
+#' @param optVols Vector of non-optimized organ volumes
+#' @return A probability to be minimized by an optimizer
+#' @importFrom magrittr %>%
+#' @importFrom stats dnorm dlnorm
+#' @importFrom dplyr mutate
+#' @keywords internal
+optimVols <- function(optVols){
+  df_opt$pertMeans <- optVols
+  ad <- bw_targ - sum(df_opt$pertMeans)
+  p_ad <- dlnorm(ad, meanlog=log(df_ad$means_scaled), sdlog=log(df_ad$std_scaled))
+  skFactor <- sqrt(bw_targ/(bw_mean*ht_rel^2))
+  df_opt <- df_opt %>% mutate(means_scaled = ifelse(organ %in% c("sk"),
+                                                    means_scaled + skFactor,
+                                                    means_scaled)) #get a new distribution for skin
+  df_opt <- suppressWarnings(df_opt %>% mutate(probs = ifelse(organ %in% normOrgan, dnorm(optVols, mean=means_scaled, sd=std_scaled),
+                                                              dlnorm(optVols, meanlog=log(means_scaled), sdlog=log(std_scaled))))) #needs to change
+  p <- -sum(c(log(df_opt$probs), log(p_ad)))  #optimize for the negative log probability because we want to maximize not minimize
+
+  return(p)
+}
+
+######################################
+
 
 
 ######################################
