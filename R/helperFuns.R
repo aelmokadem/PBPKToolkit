@@ -373,7 +373,37 @@ optimVols <- function(optVols){
 
 ######################################
 
+#' Sample covariates
+#'
+#' Takes in the a dataframe of filtered NHANES data and minimum BMI and height and returns a named list of target body weight, height and BMI
+#'
+#' @param dat Dataframe of NHANES data filtered on a specific age and sex
+#' @param minBMI Minimum BMI for the chosen age and sex
+#' @param minHT Minimum height for the chosen age and sex
+#' @return A probability to be minimized by an optimizer
+#' @importFrom magrittr %>%
+#' @importFrom stats sd
+#' @importFrom truncnorm rtruncnorm
+#' @keywords internal
+sampleCov <- function(dat, minBMI, minHT){
+  if(is.null(minBMI)){
+    bw_targ <- exp(rtruncnorm(1, a=log(minBW), b=log(maxBW), mean=mean(log(dat$BW)), sd=sd(log(dat$BW))))
+    ht_targ <- exp(rtruncnorm(1, a=log(minHT), b=log(maxHT), mean=mean(log(dat$HT/100)), sd=sd(log(dat$HT/100))))
+    bmi_targ <- bw_targ/ht_targ^2
+  }else if(is.null(minHT)){
+    bw_targ <- exp(rtruncnorm(1, a=log(minBW), b=log(maxBW), mean=mean(log(dat$BW)), sd=sd(log(dat$BW))))
+    bmi_targ <- exp(rtruncnorm(1, a=log(minBMI), b=log(maxBMI), mean=mean(log(dat$BMI)), sd=sd(log(dat$BMI))))
+    ht_targ <- sqrt(bw_targ/bmi_targ)
+  }else{
+    ## the final option is same as is.null(minBW) since we can't independently sample the 3 covs but 1 has to be derived from the others and I chose weight
+    bmi_targ <- exp(rtruncnorm(1, a=log(minBMI), b=log(maxBMI), mean=mean(log(dat$BMI)), sd=sd(log(dat$BMI))))
+    ht_targ <- exp(rtruncnorm(1, a=log(minHT), b=log(maxHT), mean=mean(log(dat$HT/100)), sd=sd(log(dat$HT/100))))
+    bw_targ <- bmi_targ*ht_targ^2
+  }
 
+  l <- list(bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ)
+  return(l)
+}
 
 ######################################
 ######################################

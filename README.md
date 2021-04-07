@@ -39,7 +39,7 @@ bw <- 73
 ht <- 1.76
 
 # generate individual physiological parameters
-indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize=TRUE)
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = TRUE)
 df_indPars <- bind_rows(indPars)
 df_indPars
 ```
@@ -70,13 +70,11 @@ minHT <- 1.5  #minimum height
 maxHT <- 1.9  #maximum height
 
 # generate population physiological parameters
-popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT)
+popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, optimize = FALSE)
 ```
 
     ## Error in test_covRange(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI) : 
-    ##   Target height is out of range for the chosen age and sex
-    ## Error in test_covRange(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI) : 
-    ##   Target BMI is out of range for the chosen age and sex
+    ##   Target body weight and BMI are out of range for the chosen age and sex
 
 ``` r
 df_popPars <- bind_rows(popPars) %>% select(ID, everything())
@@ -86,16 +84,16 @@ df_popPars
     ## # A tibble: 10 x 44
     ##       ID   Vbo   Vbr     Vgo   Vhe   Vki Vla_int   Vli   Vpa   Vsk Vsm_int   Vst
     ##    <int> <dbl> <dbl>   <dbl> <dbl> <dbl>   <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl>
-    ##  1     1 11.2   1.52 0.0369  0.387 0.425   0.496  2.37 0.174  3.51   0.868 0.207
-    ##  2     2  9.65  1.50 0.0292  0.340 0.388   0.454  2.11 0.158  2.89   0.792 0.189
-    ##  3     3 11.6   1.51 0.0367  0.388 0.428   0.501  2.38 0.176  3.58   0.875 0.209
-    ##  4     4  9.74  1.52 0.0357  0.370 0.405   0.473  2.26 0.166  3.17   0.828 0.198
-    ##  5     5 10.8   1.51 0.0347  0.374 0.416   0.486  2.30 0.170  3.35   0.849 0.203
-    ##  6     6  7.00  1.34 0.00653 0.249 0.303   0.368  1.61 0.118  1.72   0.637 0.151
-    ##  7     7  8.64  1.34 0.00709 0.270 0.328   0.399  1.75 0.128  2.04   0.691 0.164
-    ##  8     8  7.08  1.34 0.00655 0.249 0.304   0.369  1.61 0.118  1.73   0.640 0.152
-    ##  9     9  7.29  1.33 0.00640 0.246 0.303   0.366  1.59 0.116  1.72   0.635 0.151
-    ## 10    10  7.47  1.34 0.00668 0.254 0.310   0.377  1.65 0.121  1.81   0.652 0.155
+    ##  1     1 12.3   1.52 0.0390  0.404 0.442   0.516  2.47 0.182  3.83   0.903 0.216
+    ##  2     2 10.9   1.52 0.0373  0.386 0.422   0.493  2.36 0.174  3.47   0.863 0.206
+    ##  3     3 10.9   1.51 0.0333  0.368 0.413   0.483  2.27 0.169  3.30   0.842 0.201
+    ##  4     4  9.97  1.50 0.0308  0.349 0.396   0.463  2.16 0.162  3.01   0.808 0.193
+    ##  5     5 10.3   1.52 0.0364  0.378 0.413   0.483  2.31 0.170  3.31   0.844 0.202
+    ##  6     6  7.74  1.35 0.0109  0.282 0.346   0.434  1.77 0.139  2.27   0.732 0.175
+    ##  7     7  7.42  1.33 0.00646 0.247 0.305   0.369  1.60 0.117  1.75   0.640 0.152
+    ##  8     8  8.04  1.35 0.0103  0.282 0.345   0.431  1.77 0.138  2.27   0.729 0.174
+    ##  9     9  7.68  1.34 0.00844 0.268 0.326   0.402  1.71 0.129  2.02   0.689 0.164
+    ## 10    10  6.52  1.34 0.00636 0.242 0.295   0.358  1.57 0.115  1.62   0.621 0.147
     ## # … with 32 more variables: Vth <dbl>, Vln <dbl>, Vot <dbl>, Vve <dbl>,
     ## #   Var <dbl>, Vlu <dbl>, Vmu <dbl>, Vsp <dbl>, Vad <dbl>, Qbo <dbl>,
     ## #   Qbr <dbl>, Qgo <dbl>, Qhe <dbl>, Qki <dbl>, Qla_int <dbl>, Qpa <dbl>,
