@@ -183,11 +183,13 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=FALSE){
   ##age is in years; weight is in kg; height is in m
 
+  test_genPopInput(minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
+
   nFemale <- (femPerc/100)*nSubj
   nMale <- nSubj-nFemale
 
-  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBMI, minHT, optimize=optimize)
-  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBMI, minHT, optimize=optimize)
+  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize)
+  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize)
 
   pars <- c(pars_m, pars_f)
 

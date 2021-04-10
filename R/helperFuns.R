@@ -317,10 +317,7 @@ test_covRange <- function(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI
 #' @param bw_targ Target body weight
 #' @param ht_targ Target height
 #' @param bmi_targ Target BMI
-#' @param rangeBW Range of body weights for the chosen age and sex
-#' @param rangeHT Range of heights for the chosen age and sex
-#' @param rangeBW Range of BMIs for the chosen age and sex
-#' @return An error message if one or more of the covariates are out of range
+#' @return An error or a warning if inputs to genInd are not compliant
 #' @keywords internal
 test_genIndInput <- function(bw_targ, ht_targ, bmi_targ){
   if((is.null(bw_targ) && is.null(ht_targ)) | (is.null(bw_targ) && is.null(bmi_targ)) | (is.null(ht_targ) && is.null(bmi_targ))) stop("At least two inputs of bw_targ, ht_targ, or bmi_targ are required")
@@ -393,6 +390,27 @@ optimVols <- function(optVols){
 
 ######################################
 
+#' Test if inputs to genPop are compliant
+#'
+#' Takes in the target covariates and returns an error or a warning if inputs to genPop are not compliant
+#'
+#' @param minBW Minimum body weight
+#' @param maxBW Maximum body weight
+#' @param minHT Minimum height
+#' @param maxHT Maximum height
+#' @param minBMI Minimum body mass index
+#' @param maxBMI Maximum body mass index
+#' @return An error or a warning if inputs to genPop are not compliant
+#' @keywords internal
+test_genPopInput <- function(minBW, maxBW, minHT, maxHT, minBMI, maxBMI){
+  if((!is.null(minBW) && is.null(maxBW)) | (is.null(minBW) && !is.null(maxBW))) stop("Minimum and maximum values for body weight are required")
+  if((!is.null(minHT) && is.null(maxHT)) | (is.null(minHT) && !is.null(maxHT))) stop("Minimum and maximum values for height are required")
+  if((!is.null(minBMI) && is.null(maxBMI)) | (is.null(minBMI) && !is.null(maxBMI))) stop("Minimum and maximum values for BMI are required")
+  if(!is.null(minBW) && !is.null(minHT) && !is.null(minBMI)) warning("Body weight and height ranges will dictate BMI range; input BMI ranges will be ignored")
+}
+
+######################################
+
 #' Sample covariates
 #'
 #' Takes in the a dataframe of filtered NHANES data and minimum BMI and height and returns a named list of target body weight, height and BMI
@@ -405,7 +423,7 @@ optimVols <- function(optVols){
 #' @importFrom stats sd
 #' @importFrom truncnorm rtruncnorm
 #' @keywords internal
-sampleCov <- function(dat, minBMI, minHT){
+sampleCov <- function(dat, minBW, maxBW, minHT, maxHT, minBMI, maxBMI){
   if(is.null(minBMI)){
     bw_targ <- exp(rtruncnorm(1, a=log(minBW), b=log(maxBW), mean=mean(log(dat$BW)), sd=sd(log(dat$BW))))
     ht_targ <- exp(rtruncnorm(1, a=log(minHT), b=log(maxHT), mean=mean(log(dat$HT/100)), sd=sd(log(dat$HT/100))))
@@ -442,7 +460,7 @@ sampleCov <- function(dat, minBMI, minHT){
 #' @importFrom magrittr %>%
 #' @importFrom stats runif
 #' @keywords internal
-sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBMI, minHT, optimize=FALSE){
+sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=FALSE){
   pars <- rep(list(), nSubj)
 
   vol_test <- NA
@@ -453,13 +471,13 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBMI, minHT, optimiz
     sex <- ifelse(is.male, 1, 2)
     dat <- nhanesData %>% filter(AGE_YR == age & SEX == sex)
 
-    covs <- sampleCov(dat, minBMI=minBMI, minHT=minHT)
+    covs <- sampleCov(dat, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, minBMI=minBMI, maxBMI=maxBMI)
 
     bw_targ <- covs$bw_targ
     ht_targ <- covs$ht_targ
     bmi_targ <- covs$bmi_targ
 
-    t <- try(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize), silent = TRUE)  #get the individual parameters
+    t <- try(suppressWarnings(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize)), silent = TRUE)  #get the individual parameters
     if(!"try-error" %in% class(t)) vol_test <- pars[[ind]]$Vli
 
     if("try-error" %in% class(t) | is.na(vol_test)){
