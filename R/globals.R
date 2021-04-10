@@ -21,4 +21,9 @@ utils::globalVariables(c("AGE_YR",
                          "minHT",
                          "maxHT",
                          "minBMI",
-                         "maxBMI"))
+                         "maxBMI",
+                         "flowPerc",
+                         "ht_rel",
+                         "sds",
+                         "normOrgan",
+                         "bw_mean"))

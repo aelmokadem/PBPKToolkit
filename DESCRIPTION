@@ -15,7 +15,9 @@ Imports:
     dplyr (>= 1.0),
     magrittr (>= 1.5),
     nloptr,
-    truncnorm
+    truncnorm,
+    fs,
+    purrr
 Suggests: 
     knitr,
     rmarkdown,

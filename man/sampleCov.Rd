@@ -4,14 +4,14 @@
 \alias{sampleCov}
 \title{Sample covariates}
 \usage{
-sampleCov(dat, minBMI, minHT)
+sampleCov(dat, minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
 }
 \arguments{
 \item{dat}{Dataframe of NHANES data filtered on a specific age and sex}
 
-\item{minBMI}{Minimum BMI for the chosen age and sex}
-
 \item{minHT}{Minimum height for the chosen age and sex}
+
+\item{minBMI}{Minimum BMI for the chosen age and sex}
 }
 \value{
 A probability to be minimized by an optimizer

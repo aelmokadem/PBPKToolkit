@@ -4,7 +4,19 @@
 \alias{sampleIndPars}
 \title{Sample individual parameters}
 \usage{
-sampleIndPars(nSubj, minAge, maxAge, is.male, minBMI, minHT, optimize = FALSE)
+sampleIndPars(
+  nSubj,
+  minAge,
+  maxAge,
+  is.male,
+  minBW,
+  maxBW,
+  minHT,
+  maxHT,
+  minBMI,
+  maxBMI,
+  optimize = FALSE
+)
 }
 \arguments{
 \item{nSubj}{Number of subjects}
@@ -15,9 +27,9 @@ sampleIndPars(nSubj, minAge, maxAge, is.male, minBMI, minHT, optimize = FALSE)
 
 \item{is.male}{if TRUE, individual is male}
 
-\item{minBMI}{Minimum BMI for the chosen age and sex}
-
 \item{minHT}{Minimum height for the chosen age and sex}
+
+\item{minBMI}{Minimum BMI for the chosen age and sex}
 
 \item{optimize}{if TRUE, an optimization step is done for each individual}
 }
