@@ -22,7 +22,9 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   #nhanesData is nhanes anthropometric dataset; icrpData are physiological parameters from ICRP; SF is allomeric scaling factors
   #BC is organ relative blood content
 
-  if(is.null(bmi_targ)) bmi_targ <- bw_targ/ht_targ^2
+  test_genIndInput(bw_targ, ht_targ, bmi_targ)
+
+  if(!is.null(bw_targ) & !is.null(ht_targ)) bmi_targ <- bw_targ/ht_targ^2
   if(is.null(bw_targ)) bw_targ <- bmi_targ*ht_targ^2
   if(is.null(ht_targ)) ht_targ <- sqrt(bw_targ/bmi_targ)
 

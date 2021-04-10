@@ -310,6 +310,25 @@ test_covRange <- function(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI
 
 ######################################
 
+#' Test if inputs to genInd are compliant
+#'
+#' Takes in the target covariates and returns an error or a warning if inputs to genInd are not compliant
+#'
+#' @param bw_targ Target body weight
+#' @param ht_targ Target height
+#' @param bmi_targ Target BMI
+#' @param rangeBW Range of body weights for the chosen age and sex
+#' @param rangeHT Range of heights for the chosen age and sex
+#' @param rangeBW Range of BMIs for the chosen age and sex
+#' @return An error message if one or more of the covariates are out of range
+#' @keywords internal
+test_genIndInput <- function(bw_targ, ht_targ, bmi_targ){
+  if((is.null(bw_targ) && is.null(ht_targ)) | (is.null(bw_targ) && is.null(bmi_targ)) | (is.null(ht_targ) && is.null(bmi_targ))) stop("At least two inputs of bw_targ, ht_targ, or bmi_targ are required")
+  if(!is.null(bw_targ) && !is.null(ht_targ) && !is.null(bmi_targ)) warning("bmi_targ will be calculated from bw_targ and bmi_targ; input value will be ignored")
+}
+
+######################################
+
 #' Refine datasets based on age and sex
 #'
 #' Takes in the target age and sex and returns a list of datasets refined based on these covariates
