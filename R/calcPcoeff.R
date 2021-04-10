@@ -216,7 +216,7 @@ calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
   K_n_pl <- 10^logMA    #neutral phospholipids:water partition coefficient
   K_protein <- ((0.81 + 0.11 * K_n_pl)/24.92)*5
   pH <- dat_all$pH
-  alpha <- 1e-3  #ratio between ditribution coefficient at given pH (D) and that in neutral form (D0)
+  alpha <- 1e-3  #ratio between distribution coefficient at given pH (D) and that in neutral form (D0)
 
   W <- getW(type, pKa, pH)
 

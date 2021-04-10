@@ -15,7 +15,7 @@ genPop(
   maxHT = NULL,
   minBMI = NULL,
   maxBMI = NULL,
-  optimize = F
+  optimize = FALSE
 )
 }
 \arguments{

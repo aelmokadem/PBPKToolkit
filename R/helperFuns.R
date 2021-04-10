@@ -121,7 +121,7 @@ getXYZ <- function(type, pKa, pH_IW, pH_P, pH_RBC){
               #7-triprotic acid
               10^(pH_P-pKa[1])+10^(2*pH_P-pKa[1]-pKa[2])+10^(3*pH_P-pKa[1]-pKa[2]-pKa[3]),
               #8-triprotic base
-              10^(pKa[3]-pH_P)+10^(pKa[3]+pka[2]-2*pH_P)+10^(pKa[1]+pKa[2]+pKa[3]-3*pH_P),
+              10^(pKa[3]-pH_P)+10^(pKa[3]+pKa[2]-2*pH_P)+10^(pKa[1]+pKa[2]+pKa[3]-3*pH_P),
               #9-diprotic acid monoprotic base (first two are acid)
               10^(pKa[3]-pH_P)+10^(pH_P-pKa[1])+10^(2*pH_P-pKa[1]-pKa[2]),
               #10-diprotic base monoprotic acid (first one is acid)
@@ -143,7 +143,7 @@ getXYZ <- function(type, pKa, pH_IW, pH_P, pH_RBC){
               #7-triprotic acid
               1,
               #8-triprotic base
-              10^(pKa[3]-pH_RBC)+10^(pKa[3]+pka[2]-2*pH_RBC)+10^(pKa[1]+pKa[2]+pKa[3]-3*pH_RBC),
+              10^(pKa[3]-pH_RBC)+10^(pKa[3]+pKa[2]-2*pH_RBC)+10^(pKa[1]+pKa[2]+pKa[3]-3*pH_RBC),
               #9-diprotic acid monoprotic base (first two are acid)
               10^(pKa[3]-pH_RBC)+10^(pH_RBC-pKa[1])+10^(2*pH_RBC-pKa[1]-pKa[2]),
               #10-diprotic base monoprotic acid (first one is acid)
@@ -260,7 +260,7 @@ getKs <- function(type, pKa, pH, alpha, W, K_n_pl){
 #' @return An error if pKa length and type don't match
 #' @keywords internal
 test_pKaTypeMatch <- function(type, pKa){
-  if(type %in% c(2,3) & length(pKa) != 1) stop("Molecule types 2 and 3 require one pKa value")
+  if(type %in% c(2,3) & length(pKa) != 1) stop("Molecule types 1, 2, and 3 require one pKa value")
   if(type %in% c(4,5,6) & length(pKa) != 2) stop("Molecule types 4, 5, and 6 require two pKa values")
   if(type >= 7 & length(pKa) != 3) stop("Molecule types 7, 8, 9, and 10 require three pKa values")
 }
@@ -403,6 +403,55 @@ sampleCov <- function(dat, minBMI, minHT){
 
   l <- list(bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ)
   return(l)
+}
+
+######################################
+
+#' Sample individual parameters
+#'
+#' Takes in number of subjects, minimum and maximum age, sex, minimum BMI and height and the a dataframe of filtered NHANES data and minimum BMI and height and returns a named list of target body weight, height and BMI
+#'
+#' @param nSubj Number of subjects
+#' @param minAge Minimum age
+#' @param maxAge Maximum age
+#' @param is.male if TRUE, individual is male
+#' @param minBMI Minimum BMI for the chosen age and sex
+#' @param minHT Minimum height for the chosen age and sex
+#' @param optimize if TRUE, an optimization step is done for each individual
+#' @return A probability to be minimized by an optimizer
+#' @importFrom magrittr %>%
+#' @importFrom stats runif
+#' @keywords internal
+sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBMI, minHT, optimize=FALSE){
+  pars <- rep(list(), nSubj)
+
+  vol_test <- NA
+  ind <- 1
+  counter <- 1
+  while(ind <= nSubj & counter <= 100){
+    age <- round(runif(1, minAge, maxAge))
+    sex <- ifelse(is.male, 1, 2)
+    dat <- nhanesData %>% filter(AGE_YR == age & SEX == sex)
+
+    covs <- sampleCov(dat, minBMI=minBMI, minHT=minHT)
+
+    bw_targ <- covs$bw_targ
+    ht_targ <- covs$ht_targ
+    bmi_targ <- covs$bmi_targ
+
+    t <- try(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize), silent = TRUE)  #get the individual parameters
+    if(!"try-error" %in% class(t)) vol_test <- pars[[ind]]$Vli
+
+    if("try-error" %in% class(t) | is.na(vol_test)){
+      ind <- ind
+      counter <- counter + 1
+    }else{
+      ind <- ind + 1
+      counter <- 1
+    }
+    if(counter == 100) stop("No generated physiological parameters after 100 iterations. Consider modifying input parameters")
+  }
+  return(pars)
 }
 
 ######################################

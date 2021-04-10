@@ -27,7 +27,7 @@ BC <- readRDS(system.file("genPhysData", "organBloodCont.Rds", package="mrgPBPK"
 #This function generates the desired individual parameters; using linear interpolaton
 #source is mainly the PK-Sim Github page https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
 
-genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, optimize=F){
+genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, optimize=FALSE){
   #nhanesData is nhanes anthropometric dataset; icrpData are physiological parameters from ICRP; SF is allomeric scaling factors
   #BC is organ relative blood content
 
@@ -100,9 +100,8 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 
   ######################### optimization of organ volumes #################################
   #set initial values for volumes
-  l_temp <- split(df4, df4$organ %in% c("ad"))  #separate vols from ad
-  df_opt <- l_temp[["FALSE"]]
-  df_ad <- l_temp[["TRUE"]]
+  df_opt <- df4 %>% filter(organ != "ad")
+  df_ad <- df4 %>% filter(organ == "ad")
 
   #df_opt <- df4 %>% filter(organ != "ad") #remove adipose as we will not optimize for it
   pert <- runif(1)  #perturbation to parameters
@@ -131,7 +130,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
     return(p)
   }
 
-  if(isTRUE(optimize)){
+  if(optimize){
     optMod <- suppressWarnings(newuoa(optVols, optimVols))
     df_opt <- df_opt %>% mutate(optimized=optMod$par)
   }else{
@@ -188,65 +187,14 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #This function generates the desired individual parameters. It takes in the model (mod), number of subjects (n), ranges for age, height
 #and weight and and the percentage of females in the population
 
-genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=F){
-
+genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=FALSE){
   ##age is in years; weight is in kg; height is in m
+
   nFemale <- (femPerc/100)*nSubj
   nMale <- nSubj-nFemale
-  pars_m <- rep(list(), nMale)
-  pars_f <- rep(list(), nFemale)
 
-  ind <- 1
-  counter <- 1
-  while(ind <= nMale & counter <= 100){
-
-    age <- round(runif(1, minAge, maxAge))
-    is.male <- TRUE
-    dat <- nhanesData %>% filter(AGE_YR == age & SEX == 1)
-
-    covs <- sampleCov(dat, minBMI, minHT)
-
-    bw_targ <- covs$bw_targ
-    ht_targ <- covs$ht_targ
-    bmi_targ <- covs$bmi_targ
-
-    t <- try(pars_m[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize))  #get the individual parameters
-
-    if("try-error" %in% class(t)){
-      ind <- ind
-      counter <- counter + 1
-    }else{
-      ind <- ind + 1
-      counter <- 1
-    }
-  }
-
-  ind <- 1
-  counter <- 1
-  while(ind <= nFemale & counter <= 100){
-
-    # test for failed subjects to resample
-    vol_test <- NA
-    age <- round(runif(1, minAge, maxAge))
-    is.male <- FALSE
-    dat <- nhanesData %>% filter(AGE_YR == age & SEX == 2)
-
-    covs <- sampleCov(dat, minBMI, minHT)
-
-    bw_targ <- covs$bw_targ
-    ht_targ <- covs$ht_targ
-    bmi_targ <- covs$bmi_targ
-
-    t <- try(pars_f[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize))  #get the individual parameters and get error if input out of range and try again
-
-    if("try-error" %in% class(t)){
-      ind <- ind
-      counter <- counter + 1
-    }else{
-      ind <- ind + 1
-      counter <- 1
-    }
-  }
+  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBMI, minHT, optimize=optimize)
+  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBMI, minHT, optimize=optimize)
 
   pars <- c(pars_m, pars_f)
 

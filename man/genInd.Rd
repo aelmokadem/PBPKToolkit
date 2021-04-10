@@ -10,7 +10,7 @@ genInd(
   bw_targ = NULL,
   ht_targ = NULL,
   bmi_targ = NULL,
-  optimize = F
+  optimize = FALSE
 )
 }
 \arguments{
