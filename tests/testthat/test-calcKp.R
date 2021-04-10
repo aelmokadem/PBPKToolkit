@@ -1,7 +1,5 @@
 library(testthat)
 
-#ref_df <- readr::read_csv("calcKp-ref.csv", col_types = readr::cols())
-#ref_df <- readRDS(system.file("test-refs","calcKp-ref.Rds", package = "mrgPBPK"))
 ref_df <- readRDS(file.path(REF_DIR, "calcKp-ref.Rds"))
 
 purrr::pwalk(ref_df, ~ {
@@ -19,12 +17,31 @@ purrr::pwalk(ref_df, ~ {
   })
 })
 
+test_that("types_1_warning", {
+  expect_warning(
+    calcKp(logP=2, pKa=c(1,2), fup=0.5, BP=1, type=1, method="PT"),
+    regexp = "Molecule type 1 does not require pKa so it will be ignored"
+  )
+})
 
-# test_that("type13_error", {
-#   expect_error(
-#     calcKp(2, pKa=c(1,2), 0.5, 1, 1, "PT"),
-#     regexp = "Molecule types 1, 2, and 3 require one pKa value"
-#   )
-# })
+test_that("types_2_3_error", {
+  expect_error(
+    calcKp(logP=2, pKa=c(1,2), fup=0.5, BP=1, type=2, method="PT"),
+    regexp = "Molecule types 2 and 3 require one pKa value"
+  )
+})
 
+test_that("types_4_5_6_error", {
+  expect_error(
+    calcKp(logP=2, pKa=c(1), fup=0.5, BP=1, type=4, method="PT"),
+    regexp = "Molecule types 4, 5, and 6 require two pKa values"
+  )
+})
+
+test_that("types_7_8_9_10_error", {
+  expect_error(
+    calcKp(logP=2, pKa=c(1), fup=0.5, BP=1, type=7, method="PT"),
+    regexp = "Molecule types 7, 8, 9, and 10 require three pKa values"
+  )
+})
 

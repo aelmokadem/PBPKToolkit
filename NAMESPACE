@@ -3,6 +3,7 @@
 export(calcKp)
 export(genInd)
 export(genPop)
+importFrom(dplyr,as_tibble)
 importFrom(dplyr,bind_rows)
 importFrom(dplyr,filter)
 importFrom(dplyr,left_join)

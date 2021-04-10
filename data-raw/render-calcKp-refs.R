@@ -1,5 +1,8 @@
 devtools::load_all()
-library(dplyr)
+#library(dplyr)
+#'@importFrom dplyr bind_rows
+#'@importFrom tibble tribble
+#'importFrom purrr pmap_dfr
 
 test_cases <- tibble::tribble(
   ~logP,     ~pKa,   ~type,   ~BP,   ~fup,
@@ -22,6 +25,6 @@ test_cases <- bind_rows(
   mutate(slice(test_cases, 1), method = "pksim")
 )
 
-res_df <- purrr::pmap_dfr(test_cases, render_ref, .func=calcKp, out_dir="calcKpRefs")
+res_df <- pmap_dfr(test_cases, render_ref, .func=calcKp, out_dir="calcKpRefs")
 saveRDS(res_df, file.path(system.file("test-refs", package = "mrgPBPK"), "calcKp-ref.Rds"))
 

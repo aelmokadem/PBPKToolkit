@@ -47,7 +47,7 @@ df_indPars
 ```{r}
 # define the population demographics
 ## You only need to define the range for two of the three covariates: body weight, height, and BMI
-nSubj <- 100  #number of subjects
+nSubj <- 10  #number of subjects
 minAge <- 20  #minimum age
 maxAge <- 80  #maximum age
 femPerc <- 50  #percentage of females
@@ -57,7 +57,7 @@ minHT <- 1.5  #minimum height
 maxHT <- 1.9  #maximum height
 
 # generate population physiological parameters
-popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, optimize = TRUE)
+popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, optimize = FALSE)
 df_popPars <- bind_rows(popPars) %>% select(ID, everything())
 df_popPars
 ```

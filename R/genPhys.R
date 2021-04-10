@@ -1,12 +1,3 @@
-## load databases
-nhanesData <- readRDS(system.file("genPhysData", "nhanesData.Rds", package="mrgPBPK"))  #load nhanes anthropometric data
-icrpData <- readRDS(system.file("genPhysData", "icrpData.Rds", package="mrgPBPK"))  #load physiology data from ICRP publication 89
-SF <- readRDS(system.file("genPhysData", "allometricSF.Rds", package="mrgPBPK"))  #allometric scaling factors; source: https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
-normSD <- readRDS(system.file("genPhysData", "normalOrgansData.Rds", package="mrgPBPK"))  #normally distributed organs' sd
-lnormSD <- readRDS(system.file("genPhysData", "lnormalOrgansData.Rds", package="mrgPBPK"))  #log normally distributed organs' sd
-flow <- readRDS(system.file("genPhysData", "organBloodFlow.Rds", package="mrgPBPK"))  #organ blood flows
-BC <- readRDS(system.file("genPhysData", "organBloodCont.Rds", package="mrgPBPK"))  #organ blood content
-
 #' Generate individual physiological parameters
 #'
 #' Takes in desired individual demographics and generates the individual physiological parameters

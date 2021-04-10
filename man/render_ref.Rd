@@ -6,6 +6,13 @@
 \usage{
 render_ref(..., .func, out_dir)
 }
+\arguments{
+\item{...}{Dataframe with test cases in each row}
+
+\item{.func}{Function to use the row inputs for}
+
+\item{out_dir}{Output directory where the ref cases will be saved}
+}
 \description{
 This takes a single row, runs the `.func` on it, and dput's the result to a
 file. It also returns the same row with a `path` column added, which contains

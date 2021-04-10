@@ -8,7 +8,6 @@
 #' @param out_dir Output directory where the ref cases will be saved
 #' @importFrom magrittr %>%
 #' @importFrom dplyr as_tibble mutate
-#' @importFrom fs dir_exists dir_create
 #' @keywords internal
 #' **Meant to be called with `pmap_dfr()`**
 render_ref <- function(..., .func, out_dir) {
@@ -23,7 +22,7 @@ render_ref <- function(..., .func, out_dir) {
   )
 
   out_dir <- file.path(system.file("test-refs", package = "mrgPBPK"), out_dir)
-  if(!dir_exists(out_dir)) dir_create(out_dir)
+  if(!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
 
   dput(res, file.path(out_dir, out_path))
   # return the same row, with the output path added

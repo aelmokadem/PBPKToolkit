@@ -1,10 +1,3 @@
-#This function generates a list of the desired partition coefficients
-
-## load tissue composition data
-TCData <- readRDS(system.file("calcPcoeffData", "unified_tissue_comp.Rds", package="mrgPBPK"))  #organ blood content
-
-## Poulin and Theil
-
 #' Calculate partition coefficients for a molecule based on the Poulin and Theil method
 #'
 #' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Poulin and Theil method
@@ -59,8 +52,6 @@ calcKp_PT <- function(logP, pKa, fup, BP=1, type=1, dat){
 }
 
 ######################
-
-## Rodgers and Rowland
 
 #' Calculate partition coefficients for a molecule based on the Rodgers and Rowland method
 #'
@@ -133,8 +124,6 @@ calcKp_RR <- function(logP, pKa, fup, BP=1, type=1, dat){
 
 ######################
 
-## Berezhkovskiy
-
 #' Calculate partition coefficients for a molecule based on the Berezhkovskiy method
 #'
 #' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Berezhkovskiy method
@@ -191,8 +180,6 @@ calcKp_Berez <- function(logP, pKa, fup, BP=1, type=1, dat){
 
 ######################
 
-## Schmitt
-
 #' Calculate partition coefficients for a molecule based on the Schmitt method
 #'
 #' Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Schmitt method
@@ -237,8 +224,6 @@ calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
 }
 
 ######################
-
-## PK-Sim Standard
 
 #' Calculate partition coefficients for a molecule based on the PK_Sim method
 #'

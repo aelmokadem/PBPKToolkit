@@ -260,7 +260,8 @@ getKs <- function(type, pKa, pH, alpha, W, K_n_pl){
 #' @return An error if pKa length and type don't match
 #' @keywords internal
 test_pKaTypeMatch <- function(type, pKa){
-  if(type %in% c(2,3) & length(pKa) != 1) stop("Molecule types 1, 2, and 3 require one pKa value")
+  if(type %in% c(1) & !is.null(pKa)) warning("Molecule type 1 does not require pKa so it will be ignored")
+  if(type %in% c(2,3) & length(pKa) != 1) stop("Molecule types 2 and 3 require one pKa value")
   if(type %in% c(4,5,6) & length(pKa) != 2) stop("Molecule types 4, 5, and 6 require two pKa values")
   if(type >= 7 & length(pKa) != 3) stop("Molecule types 7, 8, 9, and 10 require three pKa values")
 }
