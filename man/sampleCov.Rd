@@ -9,12 +9,20 @@ sampleCov(dat, minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
 \arguments{
 \item{dat}{Dataframe of NHANES data filtered on a specific age and sex}
 
-\item{minHT}{Minimum height for the chosen age and sex}
+\item{minBW}{Minimum body weight}
 
-\item{minBMI}{Minimum BMI for the chosen age and sex}
+\item{maxBW}{Maximum body weight}
+
+\item{minHT}{Minimum height}
+
+\item{maxHT}{Maximum height}
+
+\item{minBMI}{Minimum body mass index}
+
+\item{maxBMI}{Maximum body mass index}
 }
 \value{
-A probability to be minimized by an optimizer
+A named list of target body weight, height and BMI
 }
 \description{
 Takes in the a dataframe of filtered NHANES data and minimum BMI and height and returns a named list of target body weight, height and BMI

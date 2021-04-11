@@ -27,9 +27,17 @@ sampleIndPars(
 
 \item{is.male}{if TRUE, individual is male}
 
-\item{minHT}{Minimum height for the chosen age and sex}
+\item{minBW}{Minimum body weight}
 
-\item{minBMI}{Minimum BMI for the chosen age and sex}
+\item{maxBW}{Maximum body weight}
+
+\item{minHT}{Minimum height}
+
+\item{maxHT}{Maximum height}
+
+\item{minBMI}{Minimum body mass index}
+
+\item{maxBMI}{Maximum body mass index}
 
 \item{optimize}{if TRUE, an optimization step is done for each individual}
 }

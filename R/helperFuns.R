@@ -368,12 +368,19 @@ filterDatasets <- function(age, sex){
 #' Takes in the a vector of non-optimized organ volumes and returns a probability to be minimized by an optimizer
 #'
 #' @param optVols Vector of non-optimized organ volumes
+#' @param df_opt Dataframe with volumes of organs to be optimized except for adipose
+#' @param df_ad Dataframe of adipose volume to be optimized
+#' @param bw_targ Target body weight
+#' @param bw_mean Mean body weight
+#' @param ht_rel Relative height ratio
+#' @param normOrgan Vector of normally distributed organs
+#' @param optVols Vector of non-optimized organ volumes
 #' @return A probability to be minimized by an optimizer
 #' @importFrom magrittr %>%
 #' @importFrom stats dnorm dlnorm
 #' @importFrom dplyr mutate
 #' @keywords internal
-optimVols <- function(optVols){
+optimVolsFunc <- function(optVols, df_opt, df_ad, bw_targ, bw_mean, ht_rel, normOrgan){
   df_opt$pertMeans <- optVols
   ad <- bw_targ - sum(df_opt$pertMeans)
   p_ad <- dlnorm(ad, meanlog=log(df_ad$means_scaled), sdlog=log(df_ad$std_scaled))
@@ -416,9 +423,13 @@ test_genPopInput <- function(minBW, maxBW, minHT, maxHT, minBMI, maxBMI){
 #' Takes in the a dataframe of filtered NHANES data and minimum BMI and height and returns a named list of target body weight, height and BMI
 #'
 #' @param dat Dataframe of NHANES data filtered on a specific age and sex
-#' @param minBMI Minimum BMI for the chosen age and sex
-#' @param minHT Minimum height for the chosen age and sex
-#' @return A probability to be minimized by an optimizer
+#' @param minBW Minimum body weight
+#' @param maxBW Maximum body weight
+#' @param minHT Minimum height
+#' @param maxHT Maximum height
+#' @param minBMI Minimum body mass index
+#' @param maxBMI Maximum body mass index
+#' @return A named list of target body weight, height and BMI
 #' @importFrom magrittr %>%
 #' @importFrom stats sd
 #' @importFrom truncnorm rtruncnorm
@@ -453,8 +464,12 @@ sampleCov <- function(dat, minBW, maxBW, minHT, maxHT, minBMI, maxBMI){
 #' @param minAge Minimum age
 #' @param maxAge Maximum age
 #' @param is.male if TRUE, individual is male
-#' @param minBMI Minimum BMI for the chosen age and sex
-#' @param minHT Minimum height for the chosen age and sex
+#' @param minBW Minimum body weight
+#' @param maxBW Maximum body weight
+#' @param minHT Minimum height
+#' @param maxHT Maximum height
+#' @param minBMI Minimum body mass index
+#' @param maxBMI Maximum body mass index
 #' @param optimize if TRUE, an optimization step is done for each individual
 #' @return A probability to be minimized by an optimizer
 #' @importFrom magrittr %>%

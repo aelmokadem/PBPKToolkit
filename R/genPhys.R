@@ -96,7 +96,6 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   df_opt <- df4 %>% filter(organ != "ad")
   df_ad <- df4 %>% filter(organ == "ad")
 
-  #df_opt <- df4 %>% filter(organ != "ad") #remove adipose as we will not optimize for it
   pert <- runif(1)  #perturbation to parameters
   df_opt <- df_opt %>% mutate(pertMeans = ifelse(organ %in% normOrgan,
                                                         means_scaled + std_scaled*pert,
@@ -107,24 +106,8 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 
   optVols <- df_opt$pertMeans  #initial parameter values
 
-  #set the optimization function to return probability
-  optimVols <- function(optVols){
-    df_opt$pertMeans <- optVols
-    ad <- bw_targ - sum(df_opt$pertMeans)
-    p_ad <- dlnorm(ad, meanlog=log(df_ad$means_scaled), sdlog=log(df_ad$std_scaled))
-    skFactor <- sqrt(bw_targ/(bw_mean*ht_rel^2))
-    df_opt <- df_opt %>% mutate(means_scaled = ifelse(organ %in% c("sk"),
-                                                             means_scaled + skFactor,
-                                                             means_scaled)) #get a new distribution for skin
-    df_opt <- suppressWarnings(df_opt %>% mutate(probs = ifelse(organ %in% normOrgan, dnorm(optVols, mean=means_scaled, sd=std_scaled),
-                                                                       dlnorm(optVols, meanlog=log(means_scaled), sdlog=log(std_scaled))))) #needs to change
-    p <- -sum(c(log(df_opt$probs), log(p_ad)))  #optimize for the negative log probability because we want to maximize not minimize
-
-    return(p)
-  }
-
   if(optimize){
-    optMod <- suppressWarnings(newuoa(optVols, optimVols))
+    optMod <- suppressWarnings(newuoa(optVols, optimVolsFunc, df_opt=df_opt, df_ad=df_ad, bw_targ=bw_targ, bw_mean=bw_mean, ht_rel=ht_rel, normOrgan=normOrgan))
     df_opt <- df_opt %>% mutate(optimized=optMod$par)
   }else{
     df_opt <- df_opt %>% mutate(optimized=means_scaled)
@@ -199,4 +182,5 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
   return(pars2)
 }
 
+#################################
 
