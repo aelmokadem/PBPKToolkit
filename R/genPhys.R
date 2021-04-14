@@ -133,7 +133,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   l_bf <- c(l_bf, Qli=sum(flow_li$bfs2), Qlu=sum(flow2$bfs2))
 
   ##getting final parameter list
-  pars <- c(l_ov, l_bf, BW=bw_targ, HT=ht_targ, BMI=bmi_targ, SEX=sex)
+  pars <- c(AGE=age, SEX=sex, BW=bw_targ, HT=ht_targ, BMI=bmi_targ, l_ov, l_bf)
 }
 
 
