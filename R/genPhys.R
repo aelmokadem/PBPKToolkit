@@ -8,9 +8,10 @@
 #' @param ht_targ Target height
 #' @param bmi_targ Target body mass index
 #' @param optimize if TRUE, an optimization step is done
+#' @param addBC if TRUE, blood content will be added to each organ
 #' @return Named list with physiological parameters for the desired individual
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter select mutate bind_rows left_join
+#' @importFrom dplyr filter select mutate bind_rows left_join case_when
 #' @importFrom stats approxfun plnorm quantile rnorm runif sd
 #' @importFrom nloptr newuoa
 #' @export
@@ -18,7 +19,7 @@
 #This function generates the desired individual parameters; using linear interpolaton
 #source is mainly the PK-Sim Github page https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
 
-genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, optimize=FALSE){
+genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, optimize=FALSE, addBC=TRUE){
   #nhanesData is nhanes anthropometric dataset; icrpData are physiological parameters from ICRP; SF is allomeric scaling factors
   #BC is organ relative blood content
 
@@ -70,7 +71,13 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   ################################# getting organ volumes ##########################################
   #add blood content to vols
   df_vols <- left_join(df_vols, BC, by="organ")
-  df_vols <- df_vols %>% mutate(means=means + (bloodPerc*blVol/100))
+  if(addBC){
+    df_vols <- df_vols %>% dplyr::mutate(means = means + (bloodPerc*blVol/100))
+  }else{
+    df_vols <- df_vols %>% mutate(means = case_when(organ == "ve" ~ 0.705*blVol,
+                                                    organ == "ar" ~ 0.295*blVol,
+                                                    TRUE ~ means))
+  }
   df_temp <- bind_rows(df_vols %>% select(organ, means), df_co)  #join with co again
 
   normOrgan <- normSD$organ
@@ -154,6 +161,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #' @param minBMI Minimum body mass index
 #' @param maxBMI Maximum body mass index
 #' @param optimize if TRUE, an optimization step is done for each individual
+#' @param addBC if TRUE, blood content will be added to each organ
 #' @return List of named lists with physiological parameters for each individual in the population
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
@@ -163,7 +171,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #This function generates the desired individual parameters. It takes in the model (mod), number of subjects (n), ranges for age, height
 #and weight and and the percentage of females in the population
 
-genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=FALSE){
+genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=FALSE, addBC=TRUE){
   ##age is in years; weight is in kg; height is in m
 
   test_genPopInput(minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
@@ -171,13 +179,13 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
   nFemale <- (femPerc/100)*nSubj
   nMale <- nSubj-nFemale
 
-  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize)
-  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize)
+  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC)
+  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC)
 
   pars <- c(pars_m, pars_f)
 
   # add IDs
-  pars2 <- lapply(1:length(pars), function(i) return(c(pars[[i]],list(ID = i))))
+  pars2 <- lapply(1:length(pars), function(i) return(c(list(ID = i), pars[[i]])))
 
   return(pars2)
 }

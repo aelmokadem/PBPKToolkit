@@ -15,7 +15,8 @@ sampleIndPars(
   maxHT,
   minBMI,
   maxBMI,
-  optimize = FALSE
+  optimize = FALSE,
+  addBC = TRUE
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ sampleIndPars(
 \item{maxBMI}{Maximum body mass index}
 
 \item{optimize}{if TRUE, an optimization step is done for each individual}
+
+\item{addBC}{if TRUE, blood content will be added to each organ}
 }
 \value{
 A probability to be minimized by an optimizer

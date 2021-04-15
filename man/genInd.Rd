@@ -10,7 +10,8 @@ genInd(
   bw_targ = NULL,
   ht_targ = NULL,
   bmi_targ = NULL,
-  optimize = FALSE
+  optimize = FALSE,
+  addBC = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ genInd(
 \item{bmi_targ}{Target body mass index}
 
 \item{optimize}{if TRUE, an optimization step is done}
+
+\item{addBC}{if TRUE, blood content will be added to each organ}
 }
 \value{
 Named list with physiological parameters for the desired individual

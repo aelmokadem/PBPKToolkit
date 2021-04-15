@@ -471,11 +471,12 @@ sampleCov <- function(dat, minBW, maxBW, minHT, maxHT, minBMI, maxBMI){
 #' @param minBMI Minimum body mass index
 #' @param maxBMI Maximum body mass index
 #' @param optimize if TRUE, an optimization step is done for each individual
+#' @param addBC if TRUE, blood content will be added to each organ
 #' @return A probability to be minimized by an optimizer
 #' @importFrom magrittr %>%
 #' @importFrom stats runif
 #' @keywords internal
-sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=FALSE){
+sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=FALSE, addBC=TRUE){
   pars <- rep(list(), nSubj)
 
   vol_test <- NA
@@ -492,7 +493,7 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, m
     ht_targ <- covs$ht_targ
     bmi_targ <- covs$bmi_targ
 
-    t <- try(suppressWarnings(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize)), silent = TRUE)  #get the individual parameters
+    t <- try(suppressWarnings(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize, addBC=addBC)), silent = TRUE)  #get the individual parameters
     if(!"try-error" %in% class(t)) vol_test <- pars[[ind]]$Vli
 
     if("try-error" %in% class(t) | is.na(vol_test)){

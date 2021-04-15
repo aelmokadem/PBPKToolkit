@@ -15,7 +15,8 @@ genPop(
   maxHT = NULL,
   minBMI = NULL,
   maxBMI = NULL,
-  optimize = FALSE
+  optimize = FALSE,
+  addBC = TRUE
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ genPop(
 \item{maxBMI}{Maximum body mass index}
 
 \item{optimize}{if TRUE, an optimization step is done for each individual}
+
+\item{addBC}{if TRUE, blood content will be added to each organ}
 }
 \value{
 List of named lists with physiological parameters for each individual in the population
