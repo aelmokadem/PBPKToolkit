@@ -34,7 +34,7 @@ ref <- dget(file.path(out_dir, "genPop"))
 set.seed(123)
 res <- genPop(nSubj=2, minAge=20, maxAge=80, femPerc=50, minBW=50, maxBW=100, minHT=1.5, maxHT=1.9, optimize=FALSE)
 
-test_that("genInd", {
+test_that("genPop", {
   expect_equal(
     res,
     ref
@@ -47,3 +47,30 @@ test_that("genPop_error_inputs", {
     regexp = "Minimum and maximum values for height are required"
   )
 })
+
+## genInd_mab
+ref <- dget(file.path(out_dir, "genInd_mab"))
+
+set.seed(123)
+res <- genInd_mab(age=30, is.male=TRUE, bw_targ=73, ht_targ=1.76)
+
+test_that("genInd_mab", {
+  expect_equal(
+    res,
+    ref
+  )
+})
+
+## genPop_mab
+ref <- dget(file.path(out_dir, "genPop_mab"))
+
+set.seed(123)
+res <- genPop_mab(nSubj=2, minAge=20, maxAge=80, femPerc=50, minBW=50, maxBW=100, minHT=1.5, maxHT=1.9)
+
+test_that("genPop_mab", {
+  expect_equal(
+    res,
+    ref
+  )
+})
+

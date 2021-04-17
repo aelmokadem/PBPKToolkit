@@ -163,14 +163,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #' @param optimize if TRUE, an optimization step is done for each individual
 #' @param addBC if TRUE, blood content will be added to each organ
 #' @return List of named lists with physiological parameters for each individual in the population
-#' @importFrom magrittr %>%
-#' @importFrom dplyr filter
-#' @importFrom stats runif
-#' @importFrom truncnorm rtruncnorm
 #' @export
-#This function generates the desired individual parameters. It takes in the model (mod), number of subjects (n), ranges for age, height
-#and weight and and the percentage of females in the population
-
 genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=FALSE, addBC=TRUE){
   ##age is in years; weight is in kg; height is in m
 
@@ -179,8 +172,8 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
   nFemale <- (femPerc/100)*nSubj
   nMale <- nSubj-nFemale
 
-  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC)
-  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC)
+  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC, mab=FALSE)
+  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC, mab=FALSE)
 
   pars <- c(pars_m, pars_f)
 
@@ -191,4 +184,141 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
 }
 
 #################################
+
+## mA model physiological parameters
+
+#' Generate individual physiological parameters for the mAb model
+#'
+#' Takes in desired individual demographics and generates the individual physiological parameters for the mAb model
+#'
+#' @param age Age of the individual
+#' @param is.male if TRUE, individual is male
+#' @param bw_targ Target body weight
+#' @param ht_targ Target height
+#' @param bmi_targ Target body mass index
+#' @return Named list with physiological parameters for the mAb model for the desired individual
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter select mutate case_when tibble
+#' @export
+
+genInd_mab <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL){
+  indPars <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=FALSE, addBC=FALSE)
+  foo <- tibble(param = names(indPars),
+                value = as.numeric(indPars))
+  # add stomach and gonads volumes and flows to the "Other" compartment as they are missing in the mAb model
+  # the lymph node blood flow will also be added to "Other" compartment as this flow is ignored in the mAb model
+  vols_add <- foo$value[foo$param == "Vst"] + foo$value[foo$param == "Vgo"]
+  flows_add <- foo$value[foo$param == "Qst"] + foo$value[foo$param == "Qgo"] + foo$value[foo$param == "Qln"]
+  foo$value[foo$param == "Vot"] <- foo$value[foo$param == "Vot"] + vols_add
+  foo$value[foo$param == "Qot"] <- foo$value[foo$param == "Qot"] + flows_add
+  Vbl <- foo$value[foo$param == "Var"] + foo$value[foo$param == "Vve"]
+
+  ## make necessary adjustments
+  ### vols
+  physvols <- mabShahData %>% select(Organ, Vtot, Vplas, Vbc, Vi, Ve, Vc)
+  names(physvols) <- c("Organ","total", "plas", "bc", "int", "endo", "cell")
+
+  physvols <- physvols %>%
+    mutate(param = paste0("V", tolower(substr(Organ, start = 1, stop = 2))),
+           param = case_when(param == "Vbl" ~ "Vbc",
+                             param == "Vsi" ~ "Vsm_int",
+                             param == "Vli" & Organ == "LI" ~ "Vla_int",
+                             TRUE ~ param))
+
+  foo_vols <- left_join(physvols, foo, by="param") %>%
+    mutate(value = ifelse(param == "Vpl", (3/5.3)*Vbl, value),
+           value = ifelse(param == "Vbc", (2.3/5.3)*Vbl, value),
+           plas2 = (plas/total) * value,
+           int2 = (int/total) * value) %>%
+    select(Organ, Total=value, Plas=plas2, Int=int2)
+  l_vol <- as.list(foo_vols$Total)
+  names(l_vol) <- paste0("V_", foo_vols$Organ)
+  l_int <- as.list(foo_vols$Int)
+  names(l_int) <- paste0("V_", foo_vols$Organ, "_IS")
+  l_plas <- as.list(foo_vols$Plas)
+  names(l_plas) <- paste0("V_", foo_vols$Organ, "_V")
+
+  l_volAll <- c(l_vol,l_int,l_plas)
+
+  ### flows
+  physflows <- mabShahData %>% select(Organ, Qplas, Qbc)
+  names(physflows) <- c("Organ", "plas","bc")
+
+  physflows <- physflows %>%
+    mutate(param = paste0("Q", tolower(substr(Organ, start = 1, stop = 2))),
+           param = case_when(param == "Qbl" ~ "Qbc",
+                             param == "Qsi" ~ "Qsm_int",
+                             param == "Qli" & Organ == "LI" ~ "Qla_int",
+                             param == "Qli" & Organ == "Liver" ~ "Qha",
+                             TRUE ~ param))
+
+  foo_flows <- left_join(physflows, foo, by="param")
+  foo_flows2 <- foo_flows %>%
+    # get just plasma flow that is required by the model
+    mutate(PLQ = value * (plas/(plas + bc) * 1000),
+           # sum LN plasma flow to Other
+           plas = ifelse(Organ == "Other", plas + plas[Organ == "LN"], plas),
+           # reassign PLQ_SI and PLQ_Bone
+           PLQ = ifelse(Organ == "SI", PLQ[Organ=="Lung"] * (plas[Organ=="SI"] / plas[Organ=="Lung"]), PLQ),
+           PLQ = ifelse(Organ == "Bone", PLQ[Organ=="Lung"] * (plas[Organ=="Bone"] / plas[Organ=="Lung"]), PLQ),
+           PLQ = ifelse(Organ == "Kidney", PLQ[Organ=="Lung"] * (plas[Organ=="Kidney"] / plas[Organ=="Lung"]), PLQ),
+           PLQ = ifelse(Organ == "Muscle", PLQ[Organ=="Lung"] * (plas[Organ=="Muscle"] / plas[Organ=="Lung"]), PLQ),
+           PLQ = ifelse(Organ == "LI", PLQ[Organ=="Lung"] * (plas[Organ=="LI"] / plas[Organ=="Lung"]), PLQ)) %>%
+    filter(!Organ %in% c("LN","Plasma","Bloodcells"))
+
+  # balance blood flow
+  PLQSum <- sum(foo_flows2$PLQ) - foo_flows2$PLQ[foo_flows2$Organ == "Lung"]
+  foo_flows3 <- foo_flows2 %>%
+    mutate(PLQ = ifelse(Organ == "Lung", PLQSum, PLQ),
+           plas = plas/1000,
+           PLQ = PLQ/1000) %>%
+    select(Organ, PLQ)
+  l_flows <- as.list(foo_flows3$PLQ)
+  names(l_flows) <- paste0("PLQ_", foo_flows3$Organ)
+
+  physPars <- c(SEX = indPars$SEX, BW = indPars$BW, HT = indPars$HT, BMI = indPars$BMI, l_volAll, l_flows)
+
+  # remove entries with NA that won't be used in model like IS in plasma..
+  physPars2 <- physPars[!is.na(physPars)]
+
+  return(physPars2)
+}
+
+#################################
+
+#' Generate population physiological parameters for the mAb model
+#'
+#' Takes in desired population demographics and generates the population physiological parameters for the mAb model
+#'
+#' @param nSubj Number of subjects
+#' @param minAge Minimum age
+#' @param maxAge Maximum age
+#' @param femPerc Percentage of females
+#' @param minBW Minimum body weight
+#' @param maxBW Maximum body weight
+#' @param minHT Minimum height
+#' @param maxHT Maximum height
+#' @param minBMI Minimum body mass index
+#' @param maxBMI Maximum body mass index
+#' @return List of named lists with physiological parameters for the mAb model for each individual in the population
+#' @export
+genPop_mab <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL){
+  ##age is in years; weight is in kg; height is in m
+
+  test_genPopInput(minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
+
+  nFemale <- (femPerc/100)*nSubj
+  nMale <- nSubj-nFemale
+
+  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=FALSE, addBC=FALSE, mab=TRUE)
+  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=FALSE, addBC=FALSE, mab=TRUE)
+
+  pars <- c(pars_m, pars_f)
+
+  # add IDs
+  pars2 <- lapply(1:length(pars), function(i) return(c(list(ID = i), pars[[i]])))
+
+  return(pars2)
+}
+
 
