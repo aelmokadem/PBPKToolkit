@@ -4,7 +4,7 @@
 \alias{test_calcBPInput}
 \title{Test if inputs to calcBP are compliant}
 \usage{
-test_calcBPInput(logP, method)
+test_calcBPInput(logP, fup, method)
 }
 \arguments{
 \item{logP}{Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity}

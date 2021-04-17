@@ -524,8 +524,67 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, m
 #' @param method BP calculation method; 1=logP-dependent method, 2=fup-dependent method
 #' @return An error if inputs to calcBP are not compliant
 #' @keywords internal
-test_calcBPInput <- function(logP, method){
+test_calcBPInput <- function(logP, fup, method){
+  if(method == 1 && fup == 1) stop("fup must be >= 1 for method=1")
   if(method == 2 && is.null(logP)) stop("logP is required for method=2")
+}
+
+######################################
+
+#' Get slope and intercept for calcBP or calcFup
+#'
+#' Takes in the method, generic type of molecule, and the function of interest (calcBP or calcFub) and returns the intercept and slope
+#'
+#' @param type Type of molecule; can be total, acid, base, or neutral
+#' @param method Calculation method; 1=fup-dependent method, 2=logP-dependent method
+#' @return A named list with the intercept and slope values
+#' @details Source: https://pubmed.ncbi.nlm.nih.gov/20549836/
+#' @keywords internal
+getInterceptSlope <- function(type="total", method=NULL, func){
+  if(func=="calcBP"){
+    if(type=="total" & method==1){
+      intercept <- 0.208
+      slope <- 0.617
+    }else if(type=="total" & method==2){
+      intercept <- 0.404
+      slope <- 0.181
+    }else if(type=="acid" & method==1){
+      intercept <- 0.131
+      slope <- 0.328
+    }else if(type=="acid" & method==2){
+      intercept <- 0.338
+      slope <- 0.049
+    }else if(type=="base" & method==1){
+      intercept <- 0.232
+      slope <- 0.622
+    }else if(type=="base" & method==2){
+      intercept <- 0.247
+      slope <- 0.252
+    }else if(type=="neutral" & method==1){
+      intercept <- 0.259
+      slope <- 0.686
+    }else if(type=="neutral" & method==2){
+      intercept <- 0.385
+      slope <- 0.202
+    }
+  }else if(func=="calcFup"){
+    if(type=="total"){
+      intercept <- 0.376
+      slope <- 0.252
+    }else if(type=="acid"){
+      intercept <- 0.53
+      slope <- 0.048
+    }else if(type=="base"){
+      intercept <- 0.003
+      slope <- 0.416
+    }else if(type=="neutral"){
+      intercept <- 0.229
+      slope <- 0.26
+    }
+  }
+
+  l <- list(intercept=intercept, slope=slope)
+  return(l)
 }
 
 ######################################

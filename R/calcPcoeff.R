@@ -315,19 +315,24 @@ calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
 #'
 #' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
 #' @param fup Unbound fraction of the molecule in plasma
-#' @param method BP calculation method; 1=logP-dependent method, 2=fup-dependent method
+#' @param type Type of molecule; can be total, acid, base, or neutral
+#' @param method BP calculation method; 1=fup-dependent method, 2=logP-dependent method
 #' @return Blood to plasma concentration ratio
 #' @details Source: https://pubmed.ncbi.nlm.nih.gov/20549836/
 #' @export
-calcBP <- function(logP=NULL, fup, method=1){
-  test_calcBPInput(logP, method)
+calcBP <- function(logP=NULL, fup, type="total", method=1){
+  test_calcBPInput(logP, fup, method)
 
   Ht = 0.45  # hematocrit
 
+  interceptSlope <- getInterceptSlope(type=type, method=method, func="calcBP")
+  intercept <- interceptSlope$intercept
+  slope <- interceptSlope$slope
+
   if(method==1){
-    logKb <- 0.208 + 0.617*log((1-fup)/fup)
+    logKb <- intercept + slope*log((1-fup)/fup)
   }else{
-    logKb <- 0.404 + 0.181*logP
+    logKb <- intercept + slope*logP
   }
 
   Kb <- exp(logKb)
@@ -335,3 +340,28 @@ calcBP <- function(logP=NULL, fup, method=1){
   BP <- (Kb*fup - 1)*Ht + 1
   return(BP)
 }
+
+##########################
+
+#' Calculate unbound fraction in plasma
+#'
+#' Takes in logP and type of molecule and returns the unbound fraction in plasma
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param type Type of molecule; can be total, acid, base, or neutral
+#' @return Unbound fraction in plasma
+#' @details Source: https://pubmed.ncbi.nlm.nih.gov/20549836/
+#' @export
+calcFup <- function(logP, type="total"){
+  interceptSlope <- getInterceptSlope(type=type, func="calcFup")
+  intercept <- interceptSlope$intercept
+  slope <- interceptSlope$slope
+
+  logKfup <- intercept + slope*logP
+  Kfup <- exp(logKfup)
+
+  fup <- 1/(Kfup + 1)
+
+  return(fup)
+}
+

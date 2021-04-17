@@ -1,5 +1,4 @@
-library(testthat)
-
+## calcKp for different types and methods
 ref_df <- readRDS(file.path(REF_DIR, "calcKp-ref.Rds"))
 
 purrr::pwalk(ref_df, ~ {
@@ -17,6 +16,7 @@ purrr::pwalk(ref_df, ~ {
   })
 })
 
+## calcKp type 1 warning
 test_that("types_1_warning", {
   expect_warning(
     calcKp(logP=2, pKa=c(1,2), fup=0.5, BP=1, type=1, method="PT"),
@@ -24,6 +24,7 @@ test_that("types_1_warning", {
   )
 })
 
+## calcKp error for types 2 and 3
 test_that("types_2_3_error", {
   expect_error(
     calcKp(logP=2, pKa=c(1,2), fup=0.5, BP=1, type=2, method="PT"),
@@ -31,6 +32,7 @@ test_that("types_2_3_error", {
   )
 })
 
+## calcKp error for types 4-6
 test_that("types_4_5_6_error", {
   expect_error(
     calcKp(logP=2, pKa=c(1), fup=0.5, BP=1, type=4, method="PT"),
@@ -38,6 +40,7 @@ test_that("types_4_5_6_error", {
   )
 })
 
+## calcKp error for types 7-10
 test_that("types_7_8_9_10_error", {
   expect_error(
     calcKp(logP=2, pKa=c(1), fup=0.5, BP=1, type=7, method="PT"),
@@ -45,6 +48,7 @@ test_that("types_7_8_9_10_error", {
   )
 })
 
+## calcBP method=1
 test_that("calcBP_method1", {
   expect_equal(
     calcBP(logP=1, fup=0.5, method=1),
@@ -53,18 +57,29 @@ test_that("calcBP_method1", {
   )
 })
 
+## calcBP method=2
 test_that("calcBP_method2", {
   expect_equal(
-    calcBP(logP=1, fup=0.5, method=2),
+    calcBP(logP=1, fup=0.5, type="total", method=2),
     0.953873,
     tolerance = 6
   )
 })
 
+## calcBP correct inputs
 test_that("calcBPInput_error", {
   expect_error(
-    calcBP(logP=NULL, fup=0.5, method=2),
+    calcBP(logP=NULL, fup=0.5, type="total", method=2),
     regexp = "logP is required for method=2"
+  )
+})
+
+## calcFup
+test_that("calcFup", {
+  expect_equal(
+    calcFup(logP=1, type="total"),
+    0.3479642,
+    tolerance = 7
   )
 })
 
