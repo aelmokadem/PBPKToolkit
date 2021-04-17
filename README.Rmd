@@ -7,6 +7,9 @@ output: github_document
 ```{r setup, warning=FALSE, message=FALSE}
 library(mrgPBPK)
 library(dplyr)
+library(ggplot2)
+library(cowplot)
+library(GGally)
 ```
 
 # Calculate tissue:plasma partition coefficients
@@ -23,7 +26,10 @@ method <- "PT"  #prediction method
 # calculate partition coefficients
 Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
 df_Kps <- bind_rows(Kps)
-df_Kps
+df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
+
+ggplot(data=df_Kps2, aes(Parameter, Value)) +
+  geom_col() + theme_bw()
 ```
 
 # General PBPK modeling
@@ -34,14 +40,19 @@ df_Kps
 # define the individual demographics
 ## You only need to define two of the three covariates: body weight, height, and BMI
 age <- 30
-ismale <- T
+ismale <- TRUE
 bw <- 73
 ht <- 1.76
 
 # generate individual physiological parameters
 indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FALSE)
-df_indPars <- bind_rows(indPars)
-df_indPars
+df_indPars <- bind_rows(indPars) %>% select(contains(c("Q","V")))
+df_indPars2 <- tibble(Parameter=names(df_indPars), Value=as.numeric(df_indPars))
+
+plot_vols <- ggplot(data=df_indPars2 %>% filter(grepl("V", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Volumes")
+plot_flows <- ggplot(data=df_indPars2 %>% filter(grepl("Q", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Flows")
+
+plot_grid(plot_vols, plot_flows, ncol=1)
 ```
 
 ## Generate population physiological parameters
@@ -49,7 +60,7 @@ df_indPars
 ```{r}
 # define the population demographics
 ## You only need to define the range for two of the three covariates: body weight, height, and BMI
-nSubj <- 10  #number of subjects
+nSubj <- 40  #number of subjects
 minAge <- 20  #minimum age
 maxAge <- 80  #maximum age
 femPerc <- 50  #percentage of females
@@ -61,8 +72,21 @@ maxHT <- 1.9  #maximum height
 # generate population physiological parameters
 popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, optimize = FALSE)
 df_popPars <- bind_rows(popPars) %>% select(ID, everything())
-df_popPars
+
+df_popPars <- bind_rows(popPars) %>%
+  mutate(SEX = ifelse(SEX == 1, "male", "female"),
+         SEX = factor(SEX))
+df_vols <- df_popPars %>% 
+  select(AGE, HT, BW, SEX, contains("V"))
+
+df_flows <- df_popPars %>% 
+  select(AGE, HT, BW, SEX, contains("Q"))
+
+plot_corr_vols <- ggcorr(df_vols %>% select(-SEX, -AGE, -BW, -HT, -Vot)) + labs(title = "Volumes")
+plot_corr_flows <- ggcorr(df_flows %>% select(-SEX, -AGE, -BW, -HT, -Qot)) + labs(title = "Flows")
+plot_grid(plot_corr_vols, plot_corr_flows, ncol=2)
 ```
+
 # Monoclonal antibody modeling
 
 ## Generate individual physiological parameters
@@ -78,7 +102,8 @@ ht <- 1.76
 # generate individual physiological parameters
 indPars <- genInd_mab(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht)
 df_indPars <- bind_rows(indPars)
-df_indPars
+
+head(t(df_indPars), 10)
 ```
 
 
@@ -87,7 +112,7 @@ df_indPars
 ```{r}
 # define the population demographics
 ## You only need to define the range for two of the three covariates: body weight, height, and BMI
-nSubj <- 10  #number of subjects
+nSubj <- 40  #number of subjects
 minAge <- 20  #minimum age
 maxAge <- 80  #maximum age
 femPerc <- 50  #percentage of females
@@ -99,7 +124,8 @@ maxHT <- 1.9  #maximum height
 # generate population physiological parameters
 popPars <- genPop_mab(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT)
 df_popPars <- bind_rows(popPars) %>% select(ID, everything())
-df_popPars
+
+summary(df_popPars[,1:11])
 ```
 
 

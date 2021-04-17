@@ -169,7 +169,7 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
 
   test_genPopInput(minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
 
-  nFemale <- (femPerc/100)*nSubj
+  nFemale <- floor((femPerc/100)*nSubj)
   nMale <- nSubj-nFemale
 
   pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC, mab=FALSE)
