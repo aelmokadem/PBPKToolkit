@@ -19,4 +19,7 @@ A named list with tissue:plasma partition coefficients
 \description{
 Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the PK-Sim method
 }
+\details{
+pksim: https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159
+}
 \keyword{internal}

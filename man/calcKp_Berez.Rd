@@ -25,4 +25,7 @@ A named list with tissue:plasma partition coefficients
 \description{
 Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Berezhkovskiy method
 }
+\details{
+Berez: https://pubmed.ncbi.nlm.nih.gov/15124219/
+}
 \keyword{internal}

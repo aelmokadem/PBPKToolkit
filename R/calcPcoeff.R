@@ -11,6 +11,7 @@
 #' @return A named list with tissue:plasma partition coefficients
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
+#' @details PT: https://pubmed.ncbi.nlm.nih.gov/11782904/
 #' @keywords internal
 calcKp_PT <- function(logP, pKa, fup, BP=1, type=1, dat){
 
@@ -66,6 +67,7 @@ calcKp_PT <- function(logP, pKa, fup, BP=1, type=1, dat){
 #' @return A named list with tissue:plasma partition coefficients
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
+#' @details RR: https://pubmed.ncbi.nlm.nih.gov/15858854/ and https://pubmed.ncbi.nlm.nih.gov/16639716/
 #' @keywords internal
 calcKp_RR <- function(logP, pKa, fup, BP=1, type=1, dat){
 
@@ -137,6 +139,7 @@ calcKp_RR <- function(logP, pKa, fup, BP=1, type=1, dat){
 #' @return A named list with tissue:plasma partition coefficients
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
+#' @details Berez: https://pubmed.ncbi.nlm.nih.gov/15124219/
 #' @keywords internal
 calcKp_Berez <- function(logP, pKa, fup, BP=1, type=1, dat){
 
@@ -192,6 +195,7 @@ calcKp_Berez <- function(logP, pKa, fup, BP=1, type=1, dat){
 #' @return A named list with tissue:plasma partition coefficients
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
+#' @details Schmitt: https://pubmed.ncbi.nlm.nih.gov/17981004/
 #' @keywords internal
 calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
   #logMA is the log of membrane affinity = phosphatidylcholine:water (neutral phospholipid:water) partition coefficient;
@@ -235,6 +239,7 @@ calcKp_Schmitt <- function(logP, pKa, fup, type = 1, dat){
 #' @return A named list with tissue:plasma partition coefficients
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
+#' @details pksim: https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159
 #' @keywords internal
 calcKp_pksim <- function(logP, fup, dat){
   #logMA is the log of membrane affinity = phosphatidylcholin:water (neutral phospholipid:water) partition coefficient;
@@ -272,6 +277,12 @@ calcKp_pksim <- function(logP, fup, dat){
 #' @return A named list with tissue:plasma partition coefficients
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
+#' @details Sources:
+#' @details PT: https://pubmed.ncbi.nlm.nih.gov/11782904/
+#' @details RR: https://pubmed.ncbi.nlm.nih.gov/15858854/ and https://pubmed.ncbi.nlm.nih.gov/16639716/
+#' @details Berez: https://pubmed.ncbi.nlm.nih.gov/15124219/
+#' @details Schmitt: https://pubmed.ncbi.nlm.nih.gov/17981004/
+#' @details pksim: https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159
 #' @export
 ## general function
 calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
@@ -294,4 +305,33 @@ calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT"){
   test_negativeKps(pcoeff)
 
   return(pcoeff)
+}
+
+##########################
+
+#' Calculate blood to plasma concentration ratio
+#'
+#' Takes in logP, fup, and method and returns the blood to plasma concentration ratio
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param fup Unbound fraction of the molecule in plasma
+#' @param method BP calculation method; 1=logP-dependent method, 2=fup-dependent method
+#' @return Blood to plasma concentration ratio
+#' @details Source: https://pubmed.ncbi.nlm.nih.gov/20549836/
+#' @export
+calcBP <- function(logP=NULL, fup, method=1){
+  test_calcBPInput(logP, method)
+
+  Ht = 0.45  # hematocrit
+
+  if(method==1){
+    logKb <- 0.208 + 0.617*log((1-fup)/fup)
+  }else{
+    logKb <- 0.404 + 0.181*logP
+  }
+
+  Kb <- exp(logKb)
+
+  BP <- (Kb*fup - 1)*Ht + 1
+  return(BP)
 }

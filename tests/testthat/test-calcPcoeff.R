@@ -45,3 +45,26 @@ test_that("types_7_8_9_10_error", {
   )
 })
 
+test_that("calcBP_method1", {
+  expect_equal(
+    calcBP(logP=1, fup=0.5, method=1),
+    0.827023,
+    tolerance = 6
+  )
+})
+
+test_that("calcBP_method2", {
+  expect_equal(
+    calcBP(logP=1, fup=0.5, method=2),
+    0.953873,
+    tolerance = 6
+  )
+})
+
+test_that("calcBPInput_error", {
+  expect_error(
+    calcBP(logP=NULL, fup=0.5, method=2),
+    regexp = "logP is required for method=2"
+  )
+})
+

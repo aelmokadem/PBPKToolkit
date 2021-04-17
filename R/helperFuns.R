@@ -515,4 +515,18 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, m
 }
 
 ######################################
+
+#' Test if inputs to calcBP are compliant
+#'
+#' Takes in the logP and method for calcBP and returns an error if inputs to calcBP are not compliant
+#'
+#' @param logP Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity
+#' @param method BP calculation method; 1=logP-dependent method, 2=fup-dependent method
+#' @return An error if inputs to calcBP are not compliant
+#' @keywords internal
+test_calcBPInput <- function(logP, method){
+  if(method == 2 && is.null(logP)) stop("logP is required for method=2")
+}
+
+######################################
 ######################################

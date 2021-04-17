@@ -88,8 +88,9 @@ plot_corr_flows <- ggcorr(df_flows %>% select(-SEX, -AGE, -BW, -HT, -Qot)) + lab
 plot_grid(plot_corr_vols, plot_corr_flows, ncol=2)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- --> \# Monoclonal
-antibody modeling
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+# Monoclonal antibody modeling
 
 ## Generate individual physiological parameters
 
@@ -142,23 +143,23 @@ summary(df_popPars[,1:11])
 ```
 
     ##        ID             SEX            BW              HT             BMI       
-    ##  Min.   : 1.00   Min.   :1.0   Min.   :50.60   Min.   :1.503   Min.   :18.36  
-    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.49   1st Qu.:1.594   1st Qu.:25.47  
-    ##  Median :20.50   Median :1.5   Median :80.40   Median :1.698   Median :27.78  
-    ##  Mean   :20.50   Mean   :1.5   Mean   :78.14   Mean   :1.676   Mean   :27.90  
-    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:85.56   3rd Qu.:1.731   3rd Qu.:29.94  
-    ##  Max.   :40.00   Max.   :2.0   Max.   :98.16   Max.   :1.852   Max.   :37.76  
+    ##  Min.   : 1.00   Min.   :1.0   Min.   :52.99   Min.   :1.510   Min.   :21.62  
+    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.37   1st Qu.:1.589   1st Qu.:24.11  
+    ##  Median :20.50   Median :1.5   Median :77.74   Median :1.699   Median :26.95  
+    ##  Mean   :20.50   Mean   :1.5   Mean   :78.61   Mean   :1.685   Mean   :27.82  
+    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:88.83   3rd Qu.:1.760   3rd Qu.:30.97  
+    ##  Max.   :40.00   Max.   :2.0   Max.   :98.66   Max.   :1.870   Max.   :38.99  
     ##     V_Heart           V_Lung          V_Muscle         V_Skin     
-    ##  Min.   :0.2018   Min.   :0.2420   Min.   :16.03   Min.   :1.463  
-    ##  1st Qu.:0.2217   1st Qu.:0.2970   1st Qu.:16.99   1st Qu.:1.750  
-    ##  Median :0.2725   Median :0.4290   Median :22.28   Median :2.585  
-    ##  Mean   :0.2711   Mean   :0.4001   Mean   :22.63   Mean   :2.481  
-    ##  3rd Qu.:0.3189   3rd Qu.:0.4758   3rd Qu.:28.58   3rd Qu.:3.133  
-    ##  Max.   :0.3427   Max.   :0.5378   Max.   :29.10   Max.   :3.577  
-    ##    V_Adipose         V_Bone      
-    ##  Min.   :10.33   Min.   : 6.179  
-    ##  1st Qu.:23.96   1st Qu.: 7.056  
-    ##  Median :28.09   Median : 9.015  
-    ##  Mean   :30.03   Mean   : 8.701  
-    ##  3rd Qu.:38.80   3rd Qu.: 9.851  
-    ##  Max.   :57.44   Max.   :11.615
+    ##  Min.   :0.2021   Min.   :0.2459   Min.   :16.07   Min.   :1.470  
+    ##  1st Qu.:0.2247   1st Qu.:0.3110   1st Qu.:17.04   1st Qu.:1.803  
+    ##  Median :0.2622   Median :0.4138   Median :21.80   Median :2.445  
+    ##  Mean   :0.2704   Mean   :0.3991   Mean   :22.56   Mean   :2.483  
+    ##  3rd Qu.:0.3163   3rd Qu.:0.4744   3rd Qu.:28.32   3rd Qu.:3.102  
+    ##  Max.   :0.3452   Max.   :0.5452   Max.   :29.12   Max.   :3.634  
+    ##    V_Adipose          V_Bone      
+    ##  Min.   : 5.799   Min.   : 6.234  
+    ##  1st Qu.:22.698   1st Qu.: 7.058  
+    ##  Median :30.448   Median : 8.734  
+    ##  Mean   :30.485   Mean   : 8.784  
+    ##  3rd Qu.:38.315   3rd Qu.:10.177  
+    ##  Max.   :54.506   Max.   :11.844

@@ -25,4 +25,7 @@ A named list with tissue:plasma partition coefficients
 \description{
 Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Rodgers and Rowland method
 }
+\details{
+RR: https://pubmed.ncbi.nlm.nih.gov/15858854/ and https://pubmed.ncbi.nlm.nih.gov/16639716/
+}
 \keyword{internal}

@@ -25,3 +25,16 @@ A named list with tissue:plasma partition coefficients
 \description{
 Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients
 }
+\details{
+Sources:
+
+PT: https://pubmed.ncbi.nlm.nih.gov/11782904/
+
+RR: https://pubmed.ncbi.nlm.nih.gov/15858854/ and https://pubmed.ncbi.nlm.nih.gov/16639716/
+
+Berez: https://pubmed.ncbi.nlm.nih.gov/15124219/
+
+Schmitt: https://pubmed.ncbi.nlm.nih.gov/17981004/
+
+pksim: https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159
+}

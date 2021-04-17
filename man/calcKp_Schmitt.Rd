@@ -23,4 +23,7 @@ A named list with tissue:plasma partition coefficients
 \description{
 Takes in the molecule's physicochemical properties and returns the tissue:plasma partition coefficients based on the Schmitt method
 }
+\details{
+Schmitt: https://pubmed.ncbi.nlm.nih.gov/17981004/
+}
 \keyword{internal}
