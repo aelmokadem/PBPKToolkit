@@ -1,8 +1,7 @@
 devtools::load_all()
-#library(dplyr)
-#'@importFrom dplyr bind_rows
-#'@importFrom tibble tribble
-#'importFrom purrr pmap_dfr
+#' @importFrom dplyr bind_rows
+#' @importFrom tibble tribble
+#' @importFrom purrr pmap_dfr
 
 test_cases <- tibble::tribble(
   ~logP,     ~pKa,   ~type,   ~BP,   ~fup,
