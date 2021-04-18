@@ -202,7 +202,7 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
 #' @export
 
 genInd_mab <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL){
-  indPars <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=FALSE, addBC=FALSE)
+  indPars <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=FALSE, addBC=TRUE)
   foo <- tibble(param = names(indPars),
                 value = as.numeric(indPars))
   # add stomach and gonads volumes and flows to the "Other" compartment as they are missing in the mAb model
@@ -211,7 +211,8 @@ genInd_mab <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL){
   flows_add <- foo$value[foo$param == "Qst"] + foo$value[foo$param == "Qgo"] + foo$value[foo$param == "Qln"]
   foo$value[foo$param == "Vot"] <- foo$value[foo$param == "Vot"] + vols_add
   foo$value[foo$param == "Qot"] <- foo$value[foo$param == "Qot"] + flows_add
-  Vbl <- foo$value[foo$param == "Var"] + foo$value[foo$param == "Vve"]
+  BCbl <- (BC$bloodPerc[BC$organ == "ar"] + BC$bloodPerc[BC$organ == "ve"])/100
+  Vbl <- (foo$value[foo$param == "Var"] + foo$value[foo$param == "Vve"])/BCbl  #get full body volume
 
   ## make necessary adjustments
   ### vols
@@ -242,7 +243,7 @@ genInd_mab <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL){
 
   ### flows
   physflows <- mabShahData %>% select(Organ, Qplas, Qbc)
-  names(physflows) <- c("Organ", "plas","bc")
+  names(physflows) <- c("Organ","plas","bc")
 
   physflows <- physflows %>%
     mutate(param = paste0("Q", tolower(substr(Organ, start = 1, stop = 2))),
