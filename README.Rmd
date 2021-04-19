@@ -2,6 +2,8 @@
 output: github_document
 ---
 
+mrgPBPK is an R package that provides a set of functions to be used for PBPK modeling. The functions mainly generate drug- and system-specific parameters required to build a PBPK model. There are two versions of the system-specific parameter-generating functions: a general PBPK model version and a monoclonal Ab PBPK model version.
+
 # Load libraries
 
 ```{r setup, warning=FALSE, message=FALSE}
@@ -12,7 +14,13 @@ library(cowplot)
 library(GGally)
 ```
 
-# Calculate tissue:plasma partition coefficients
+# Generating drug-specific parameters
+
+## Calculate tissue:plasma partition coefficients (Kp)
+
+The function `calcKp` can calculate the molecule's Kp values for different organs using one of five different calculation methods:
+
+- PT: Poulin and Theil 
 
 ```{r}
 # define molecule's physicochemical properties
@@ -31,6 +39,16 @@ df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
 ggplot(data=df_Kps2, aes(Parameter, Value)) +
   geom_col() + theme_bw()
 ```
+## Calculate blood:plasma concentration ratio (BP)
+
+In case BP parameter was missing, the function `calcBP` can be used 
+
+```{r}
+# in case BP parameter was missing, the function calcBP
+```
+
+
+## Calculate unbound fraction in plasma (fup)
 
 # General PBPK modeling
 

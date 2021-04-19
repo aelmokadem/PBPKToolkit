@@ -109,17 +109,17 @@ df_indPars <- bind_rows(indPars)
 head(t(df_indPars), 10)
 ```
 
-    ##                 [,1]
-    ## SEX        1.0000000
-    ## BW        73.0000000
-    ## HT         1.7600000
-    ## BMI       23.5666322
-    ## V_Heart    0.3117982
-    ## V_Lung     0.4728204
-    ## V_Muscle  27.9873714
-    ## V_Skin     3.0831851
-    ## V_Adipose 16.5495677
-    ## V_Bone    10.1870098
+    ##                [,1]
+    ## SEX        1.000000
+    ## BW        73.000000
+    ## HT         1.760000
+    ## BMI       23.566632
+    ## V_Heart    0.366579
+    ## V_Lung     1.152143
+    ## V_Muscle  28.748212
+    ## V_Skin     3.249019
+    ## V_Adipose 16.829509
+    ## V_Bone    10.575605
 
 ## Generate population physiological parameters
 
@@ -143,23 +143,23 @@ summary(df_popPars[,1:11])
 ```
 
     ##        ID             SEX            BW              HT             BMI       
-    ##  Min.   : 1.00   Min.   :1.0   Min.   :52.99   Min.   :1.510   Min.   :21.62  
-    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.37   1st Qu.:1.589   1st Qu.:24.11  
-    ##  Median :20.50   Median :1.5   Median :77.74   Median :1.699   Median :26.95  
-    ##  Mean   :20.50   Mean   :1.5   Mean   :78.61   Mean   :1.685   Mean   :27.82  
-    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:88.83   3rd Qu.:1.760   3rd Qu.:30.97  
-    ##  Max.   :40.00   Max.   :2.0   Max.   :98.66   Max.   :1.870   Max.   :38.99  
+    ##  Min.   : 1.00   Min.   :1.0   Min.   :53.23   Min.   :1.508   Min.   :19.61  
+    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.01   1st Qu.:1.603   1st Qu.:24.87  
+    ##  Median :20.50   Median :1.5   Median :78.00   Median :1.661   Median :28.27  
+    ##  Mean   :20.50   Mean   :1.5   Mean   :78.20   Mean   :1.667   Mean   :28.17  
+    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:89.49   3rd Qu.:1.735   3rd Qu.:30.64  
+    ##  Max.   :40.00   Max.   :2.0   Max.   :97.25   Max.   :1.839   Max.   :38.75  
     ##     V_Heart           V_Lung          V_Muscle         V_Skin     
-    ##  Min.   :0.2021   Min.   :0.2459   Min.   :16.07   Min.   :1.470  
-    ##  1st Qu.:0.2247   1st Qu.:0.3110   1st Qu.:17.04   1st Qu.:1.803  
-    ##  Median :0.2622   Median :0.4138   Median :21.80   Median :2.445  
-    ##  Mean   :0.2704   Mean   :0.3991   Mean   :22.56   Mean   :2.483  
-    ##  3rd Qu.:0.3163   3rd Qu.:0.4744   3rd Qu.:28.32   3rd Qu.:3.102  
-    ##  Max.   :0.3452   Max.   :0.5452   Max.   :29.12   Max.   :3.634  
+    ##  Min.   :0.2349   Min.   :0.6659   Min.   :16.59   Min.   :1.565  
+    ##  1st Qu.:0.2496   1st Qu.:0.7218   1st Qu.:17.23   1st Qu.:1.775  
+    ##  Median :0.3000   Median :0.9666   Median :21.98   Median :2.490  
+    ##  Mean   :0.3090   Mean   :0.9488   Mean   :22.91   Mean   :2.524  
+    ##  3rd Qu.:0.3658   3rd Qu.:1.1484   3rd Qu.:28.99   3rd Qu.:3.186  
+    ##  Max.   :0.3976   Max.   :1.2297   Max.   :29.86   Max.   :3.694  
     ##    V_Adipose          V_Bone      
-    ##  Min.   : 5.799   Min.   : 6.234  
-    ##  1st Qu.:22.698   1st Qu.: 7.058  
-    ##  Median :30.448   Median : 8.734  
-    ##  Mean   :30.485   Mean   : 8.784  
-    ##  3rd Qu.:38.315   3rd Qu.:10.177  
-    ##  Max.   :54.506   Max.   :11.844
+    ##  Min.   : 8.753   Min.   : 6.438  
+    ##  1st Qu.:21.167   1st Qu.: 7.285  
+    ##  Median :31.472   Median : 8.656  
+    ##  Mean   :31.152   Mean   : 8.828  
+    ##  3rd Qu.:37.717   3rd Qu.:10.243  
+    ##  Max.   :56.791   Max.   :11.788
