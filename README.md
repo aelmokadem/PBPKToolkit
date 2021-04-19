@@ -1,4 +1,10 @@
 
+# mrgPBPK
+
+mrgPBPK is an open-source R package that provides a set of functions to
+be used for PBPK modeling. The functions mainly generate drug- and
+system-specific parameters required to build a PBPK model.
+
 # Load libraries
 
 ``` r
@@ -9,7 +15,27 @@ library(cowplot)
 library(GGally)
 ```
 
-# Calculate tissue:plasma partition coefficients
+# Generate drug-specific parameters
+
+## Calculate tissue:plasma partition coefficients (Kp)
+
+The function `calcKp` can calculate the molecule’s Kp values for
+different organs using one of five different calculation methods:
+
+  - PT: Poulin and Theil
+    ([source](https://pubmed.ncbi.nlm.nih.gov/11782904/)).
+  - RR: Rodgers and Rowland
+    ([source1](https://pubmed.ncbi.nlm.nih.gov/15858854/) and
+    [source2](https://pubmed.ncbi.nlm.nih.gov/16639716/)).
+  - Berez: Berezhkovskiy
+    ([source](https://pubmed.ncbi.nlm.nih.gov/15124219/)).
+  - Schmitt: Schimtt
+    ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
+  - pksim: PK-Sim
+    ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
+
+The function uses the unified tissue composition data reported in
+<https://dmd.aspetjournals.org/content/48/10/903>
 
 ``` r
 # define molecule's physicochemical properties
@@ -31,9 +57,80 @@ ggplot(data=df_Kps2, aes(Parameter, Value)) +
 
 ![](README_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
-# General PBPK modeling
+## Calculate blood:plasma concentration ratio (BP)
 
-## Generate individual physiological parameters
+In case BP parameter was missing, the function `calcBP` can be used to
+calculate BP based on the methods reported
+[here](https://pubmed.ncbi.nlm.nih.gov/20549836/). There are two methods
+to chose from:
+
+  - Method 1: uses molecule’s fup to calculate BP.
+  - Method 2: uses molecule’s logP (or another measurement of
+    lipophilicity like logD) to calculate BP.
+
+Note: drug type = “total” is the default type and it uses the regression
+coefficients calculated by fitting different molecule types (acids,
+bases, and neutrals) together.
+
+``` r
+# in case BP parameter was missing, the function calcBP
+calcBP(fup = fup, method = 1)
+```
+
+    ## [1] 0.827023
+
+``` r
+calcBP(logP = logP, fup = fup, method = 2)
+```
+
+    ## [1] 1.034007
+
+## Calculate unbound fraction in plasma (fup)
+
+In case fup parameter was missing, the function `calcFup` can be used to
+calculate fup using the molecule’s logP (or another measurement of
+lipophilicity like logD) based on the method reported
+[here](https://pubmed.ncbi.nlm.nih.gov/20549836/).
+
+``` r
+# in case BP parameter was missing, the function calcBP
+calcFup(logP = logP)
+```
+
+    ## [1] 0.2931778
+
+# Generate system-specific parameters
+
+System-related (physiologic) parameters required for PBPK modeling are
+the organ volumes and blood flows. There are two versions of the
+functions that generate the physiologic parameters, a version to be
+applied for general PBPK modeling of small molecules and another
+specific for monoclonal antibody PBPK modeling.
+
+## Small molecule PBPK modeling
+
+Two functions `genInd` and `genPop` can be used to generate a virtual
+individual or a population, respectively, for PBPK modeling of small
+molecules. The algorithm used is adapted from Willmann et al 2007
+[source](https://pubmed.ncbi.nlm.nih.gov/17431751/) and it maintains a
+correlation between the physiologic parameters and the sampled
+individual’s covariates to generate realistic individuals. The algorithm
+is guided by these databases:
+
+  - NHANES data for anthropometric data
+    ([source](https://www.cdc.gov/nchs/nhanes/index.htm)).
+  - ICRP data for physiologic parameters of typical individuals
+    ([source](https://journals.sagepub.com/doi/pdf/10.1177/ANIB_32_3-4)).
+  - Willmann et al 2007 data for organ variability
+    ([source](https://pubmed.ncbi.nlm.nih.gov/17431751/)).
+
+The function `genInd` takes age, sex, and two inputs of body weight,
+height, and BMI. It returns a named list of the covariates and the
+physiologic parameters with volumes prefixed with `V` and flows prefixed
+with `Q`. The logical argument `optimize` states if the user wants to
+run an additional optimization step on the generated organ volumes. This
+step would give better parameter predictions but will take longer to
+run.
 
 ``` r
 # define the individual demographics
@@ -54,9 +151,13 @@ plot_flows <- ggplot(data=df_indPars2 %>% filter(grepl("Q", Parameter)), aes(Par
 plot_grid(plot_vols, plot_flows, ncol=1)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-## Generate population physiological parameters
+The function `genPop` takes ranges of ages, and two ranges of body
+weights, heights, or BMIs as well as the percentage of females in the
+desired population. It returns a named list of lists with the upper
+level being the individuals’ IDs and the nested list is each
+individual’s covariates and physiologic parameters.
 
 ``` r
 # define the population demographics
@@ -88,11 +189,20 @@ plot_corr_flows <- ggcorr(df_flows %>% select(-SEX, -AGE, -BW, -HT, -Qot)) + lab
 plot_grid(plot_corr_vols, plot_corr_flows, ncol=2)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-# Monoclonal antibody modeling
+# Monoclonal antibody PBPK modeling
 
-## Generate individual physiological parameters
+The functions `genInd_mab` and `genPop_mab` take the same inputs as
+`genInd` and `genPop`, respectively, but they return physiologic
+parameters to be used for monoclonal antibody (mAb) PBPK modeling. The
+parameter names are consistent with the names used in the mAb PBPK model
+developed
+[here](https://github.com/metrumresearchgroup/bioPBPK/tree/main/mAb_bamlanivimab)
+and was based on the model reported by Shah and Betts 2012
+([source](https://pubmed.ncbi.nlm.nih.gov/22143261/)) and Jones et al
+2019
+([source](https://ascpt.onlinelibrary.wiley.com/doi/full/10.1002/psp4.12461)).
 
 ``` r
 # define the individual demographics
@@ -143,23 +253,23 @@ summary(df_popPars[,1:11])
 ```
 
     ##        ID             SEX            BW              HT             BMI       
-    ##  Min.   : 1.00   Min.   :1.0   Min.   :53.23   Min.   :1.508   Min.   :19.61  
-    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.01   1st Qu.:1.603   1st Qu.:24.87  
-    ##  Median :20.50   Median :1.5   Median :78.00   Median :1.661   Median :28.27  
-    ##  Mean   :20.50   Mean   :1.5   Mean   :78.20   Mean   :1.667   Mean   :28.17  
-    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:89.49   3rd Qu.:1.735   3rd Qu.:30.64  
-    ##  Max.   :40.00   Max.   :2.0   Max.   :97.25   Max.   :1.839   Max.   :38.75  
+    ##  Min.   : 1.00   Min.   :1.0   Min.   :51.79   Min.   :1.501   Min.   :20.28  
+    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.25   1st Qu.:1.598   1st Qu.:24.19  
+    ##  Median :20.50   Median :1.5   Median :77.58   Median :1.668   Median :27.97  
+    ##  Mean   :20.50   Mean   :1.5   Mean   :77.65   Mean   :1.662   Mean   :28.16  
+    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:88.16   3rd Qu.:1.722   3rd Qu.:32.10  
+    ##  Max.   :40.00   Max.   :2.0   Max.   :99.76   Max.   :1.850   Max.   :37.81  
     ##     V_Heart           V_Lung          V_Muscle         V_Skin     
-    ##  Min.   :0.2349   Min.   :0.6659   Min.   :16.59   Min.   :1.565  
-    ##  1st Qu.:0.2496   1st Qu.:0.7218   1st Qu.:17.23   1st Qu.:1.775  
-    ##  Median :0.3000   Median :0.9666   Median :21.98   Median :2.490  
-    ##  Mean   :0.3090   Mean   :0.9488   Mean   :22.91   Mean   :2.524  
-    ##  3rd Qu.:0.3658   3rd Qu.:1.1484   3rd Qu.:28.99   3rd Qu.:3.186  
-    ##  Max.   :0.3976   Max.   :1.2297   Max.   :29.86   Max.   :3.694  
+    ##  Min.   :0.2332   Min.   :0.6608   Min.   :16.50   Min.   :1.546  
+    ##  1st Qu.:0.2552   1st Qu.:0.7361   1st Qu.:17.48   1st Qu.:1.821  
+    ##  Median :0.2972   Median :0.9396   Median :22.31   Median :2.389  
+    ##  Mean   :0.3108   Mean   :0.9494   Mean   :23.10   Mean   :2.527  
+    ##  3rd Qu.:0.3655   3rd Qu.:1.1481   3rd Qu.:29.08   3rd Qu.:3.192  
+    ##  Max.   :0.3880   Max.   :1.2072   Max.   :29.77   Max.   :3.608  
     ##    V_Adipose          V_Bone      
-    ##  Min.   : 8.753   Min.   : 6.438  
-    ##  1st Qu.:21.167   1st Qu.: 7.285  
-    ##  Median :31.472   Median : 8.656  
-    ##  Mean   :31.152   Mean   : 8.828  
-    ##  3rd Qu.:37.717   3rd Qu.:10.243  
-    ##  Max.   :56.791   Max.   :11.788
+    ##  Min.   : 7.277   Min.   : 6.368  
+    ##  1st Qu.:19.756   1st Qu.: 7.311  
+    ##  Median :31.800   Median : 8.425  
+    ##  Mean   :30.406   Mean   : 8.808  
+    ##  3rd Qu.:40.376   3rd Qu.:10.289  
+    ##  Max.   :57.650   Max.   :11.818

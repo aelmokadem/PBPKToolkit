@@ -36,7 +36,7 @@ NULL
 #'   \item{BMI}{Body mass index, in kg/m^2}
 #'   \item{BSA}{Body surface area, in m^2}
 #' }
-#' @source \url{https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm}
+#' @source \url{https://www.cdc.gov/nchs/nhanes/index.htm}
 NULL
 
 #' ICRP dataset (icrpData)
