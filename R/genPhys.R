@@ -322,4 +322,26 @@ genPop_mab <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NUL
   return(pars2)
 }
 
+#################################
 
+#' Get the built-in virtual population data
+#'
+#' Takes in the model type and returns the built-in virtual population data for 1000 subjects
+#'
+#' @param model Model type; can be "general" or "mAb"
+#' @details The covariates used to generate the virtual population are:
+#' @details Number of subjects: 1000
+#' @details Age: 20-80 years
+#' @details Female percentage: 50 percent
+#' @details Body weight: 50-100 kg
+#' @details Height: 1.5-1.9 m
+#' @return List of named lists with physiological parameters for the virtual population
+#' @export
+getVirtPop <- function(model="general"){
+  if(model == "general"){
+    virtPop <- virtPop_gen
+  }else{
+    virtPop <- virtPop_mab
+  }
+  return(virtPop)
+}

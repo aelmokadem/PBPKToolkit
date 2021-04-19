@@ -107,7 +107,7 @@ functions that generate the physiologic parameters, a version to be
 applied for general PBPK modeling of small molecules and another
 specific for monoclonal antibody PBPK modeling.
 
-## Small molecule PBPK modeling
+## General small molecule PBPK modeling
 
 Two functions `genInd` and `genPop` can be used to generate a virtual
 individual or a population, respectively, for PBPK modeling of small
@@ -253,23 +253,23 @@ summary(df_popPars[,1:11])
 ```
 
     ##        ID             SEX            BW              HT             BMI       
-    ##  Min.   : 1.00   Min.   :1.0   Min.   :51.79   Min.   :1.501   Min.   :20.28  
-    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.25   1st Qu.:1.598   1st Qu.:24.19  
-    ##  Median :20.50   Median :1.5   Median :77.58   Median :1.668   Median :27.97  
-    ##  Mean   :20.50   Mean   :1.5   Mean   :77.65   Mean   :1.662   Mean   :28.16  
-    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:88.16   3rd Qu.:1.722   3rd Qu.:32.10  
-    ##  Max.   :40.00   Max.   :2.0   Max.   :99.76   Max.   :1.850   Max.   :37.81  
+    ##  Min.   : 1.00   Min.   :1.0   Min.   :52.30   Min.   :1.535   Min.   :19.16  
+    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:61.94   1st Qu.:1.591   1st Qu.:23.45  
+    ##  Median :20.50   Median :1.5   Median :77.78   Median :1.665   Median :27.60  
+    ##  Mean   :20.50   Mean   :1.5   Mean   :75.85   Mean   :1.668   Mean   :27.36  
+    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:85.52   3rd Qu.:1.726   3rd Qu.:31.39  
+    ##  Max.   :40.00   Max.   :2.0   Max.   :99.47   Max.   :1.852   Max.   :39.26  
     ##     V_Heart           V_Lung          V_Muscle         V_Skin     
-    ##  Min.   :0.2332   Min.   :0.6608   Min.   :16.50   Min.   :1.546  
-    ##  1st Qu.:0.2552   1st Qu.:0.7361   1st Qu.:17.48   1st Qu.:1.821  
-    ##  Median :0.2972   Median :0.9396   Median :22.31   Median :2.389  
-    ##  Mean   :0.3108   Mean   :0.9494   Mean   :23.10   Mean   :2.527  
-    ##  3rd Qu.:0.3655   3rd Qu.:1.1481   3rd Qu.:29.08   3rd Qu.:3.192  
-    ##  Max.   :0.3880   Max.   :1.2072   Max.   :29.77   Max.   :3.608  
-    ##    V_Adipose          V_Bone      
-    ##  Min.   : 7.277   Min.   : 6.368  
-    ##  1st Qu.:19.756   1st Qu.: 7.311  
-    ##  Median :31.800   Median : 8.425  
-    ##  Mean   :30.406   Mean   : 8.808  
-    ##  3rd Qu.:40.376   3rd Qu.:10.289  
-    ##  Max.   :57.650   Max.   :11.818
+    ##  Min.   :0.2403   Min.   :0.6879   Min.   :16.52   Min.   :1.641  
+    ##  1st Qu.:0.2627   1st Qu.:0.7860   1st Qu.:17.66   1st Qu.:1.945  
+    ##  Median :0.3188   Median :1.0206   Median :22.60   Median :2.718  
+    ##  Mean   :0.3181   Mean   :0.9829   Mean   :23.33   Mean   :2.640  
+    ##  3rd Qu.:0.3716   3rd Qu.:1.1632   3rd Qu.:29.22   3rd Qu.:3.264  
+    ##  Max.   :0.3989   Max.   :1.2332   Max.   :29.77   Max.   :3.738  
+    ##    V_Adipose         V_Bone      
+    ##  Min.   : 5.75   Min.   : 6.822  
+    ##  1st Qu.:19.61   1st Qu.: 7.456  
+    ##  Median :25.27   Median : 9.141  
+    ##  Mean   :27.92   Mean   : 8.954  
+    ##  3rd Qu.:39.81   3rd Qu.:10.246  
+    ##  Max.   :57.09   Max.   :12.027

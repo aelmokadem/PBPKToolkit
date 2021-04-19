@@ -76,7 +76,7 @@ calcFup(logP = logP)
 
 System-related (physiologic) parameters required for PBPK modeling are the organ volumes and blood flows. There are two versions of the functions that generate the physiologic parameters, a version to be applied for general PBPK modeling of small molecules and another specific for monoclonal antibody PBPK modeling.  
 
-## Small molecule PBPK modeling
+## General small molecule PBPK modeling
 
 Two functions `genInd` and `genPop` can be used to generate a virtual individual or a population, respectively, for PBPK modeling of small molecules. The algorithm used is adapted from Willmann et al 2007 [source](https://pubmed.ncbi.nlm.nih.gov/17431751/) and it maintains a correlation between the physiologic parameters and the sampled individual's covariates to generate realistic individuals. The algorithm is guided by these databases:
 

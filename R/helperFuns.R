@@ -537,8 +537,8 @@ test_calcBPInput <- function(logP, fup, method){
 #'
 #' @param type Type of molecule; can be total, acid, base, or neutral
 #' @param method Calculation method; 1=fup-dependent method, 2=logP-dependent method
-#' @return A named list with the intercept and slope values
 #' @details Source: https://pubmed.ncbi.nlm.nih.gov/20549836/
+#' @return A named list with the intercept and slope values
 #' @keywords internal
 getInterceptSlope <- function(type="total", method=NULL, func){
   if(func=="calcBP"){

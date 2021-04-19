@@ -19,6 +19,8 @@
 #'   \item{LR}{Lipoprotein ratio}
 #' }
 #' @source \url{https://dmd.aspetjournals.org/content/48/10/903}
+#' @name TCData
+#' @keywords internal
 NULL
 
 #' NHANES dataset (nhanesData)
@@ -37,6 +39,8 @@ NULL
 #'   \item{BSA}{Body surface area, in m^2}
 #' }
 #' @source \url{https://www.cdc.gov/nchs/nhanes/index.htm}
+#' @name nhanesData
+#' @keywords internal
 NULL
 
 #' ICRP dataset (icrpData)
@@ -94,6 +98,8 @@ NULL
 #'   \item{ot_f}{Female other organs volume, in L}
 #' }
 #' @source \url{https://journals.sagepub.com/doi/pdf/10.1177/ANIB_32_3-4}
+#' @name icrpData
+#' @keywords internal
 NULL
 
 #' Percentages of blood flow (flow)
@@ -106,6 +112,8 @@ NULL
 #'   \item{flowPerc}{Percentage of blood flow}
 #' }
 #' @source \url{https://journals.sagepub.com/doi/pdf/10.1177/ANIB_32_3-4}
+#' @name flow
+#' @keywords internal
 NULL
 
 #' Percentages of blood content (BC)
@@ -118,6 +126,8 @@ NULL
 #'   \item{bloodPerc}{Percentage of blood content}
 #' }
 #' @source \url{https://journals.sagepub.com/doi/pdf/10.1177/ANIB_32_3-4}
+#' @name BC
+#' @keywords internal
 NULL
 
 #' Coefficient of variation (normSD)
@@ -130,6 +140,8 @@ NULL
 #'   \item{cv}{Coefficient of variation}
 #' }
 #' @source \url{https://pubmed.ncbi.nlm.nih.gov/17431751/}
+#' @name normSD
+#' @keywords internal
 NULL
 
 #' Geometric standard deviation (lnormSD)
@@ -142,6 +154,8 @@ NULL
 #'   \item{geomSD}{Geometric standard deviation}
 #' }
 #' @source \url{https://pubmed.ncbi.nlm.nih.gov/17431751/}
+#' @name lnormSD
+#' @keywords internal
 NULL
 
 #' Scaling factors (SF)
@@ -154,6 +168,8 @@ NULL
 #'   \item{SF}{Scaling factors}
 #' }
 #' @source \url{https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm}
+#' @name SF
+#' @keywords internal
 NULL
 
 #' Physiological data for mAb PBPK model (mabShahData)
@@ -173,5 +189,7 @@ NULL
 #'   \item{Qbc}{Blood cell flow}
 #' }
 #' @source \url{https://pubmed.ncbi.nlm.nih.gov/22143261/}
+#' @name mabShahData
+#' @keywords internal
 NULL
 
