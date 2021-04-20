@@ -7,7 +7,7 @@
 A data frame with 4 rows and 2 variables:
 \describe{
   \item{organ}{Human body organs}
-  \item{SF}{Scaling factors}
+  \item{factor}{Scaling factors}
 }
 }
 \source{

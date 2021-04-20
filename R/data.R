@@ -165,7 +165,7 @@ NULL
 #' @format A data frame with 4 rows and 2 variables:
 #' \describe{
 #'   \item{organ}{Human body organs}
-#'   \item{SF}{Scaling factors}
+#'   \item{factor}{Scaling factors}
 #' }
 #' @source \url{https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm}
 #' @name SF
@@ -192,4 +192,45 @@ NULL
 #' @name mabShahData
 #' @keywords internal
 NULL
+
+## virtual population data
+
+#' Virtual population for a general small molecule PBPK model
+#'
+#' A list of lists with the physiological data for the virtual population of 1000 subjects to be used for a general small molecule PBPK modeling.
+#'
+#' @format A list of lists with a length of 1000 IDs for the upper level and of 45 for the nested lists
+#' \describe{
+#'   \item{ID}{Subject ID}
+#'   \item{AGE}{Age, in years}
+#'   \item{SEX}{Sex; 1=male and 2=female}
+#'   \item{BW}{Body weight, in kg}
+#'   \item{HT}{Height, in m}
+#'   \item{BMI}{Body mass index, in kg/m^2}
+#'   ...
+#' }
+#' @details Prefix: V=volume, Q=flow
+#' @details Abbreviation: bo=bone, br=brain, go=gonads, he=heart, ki=kidneys, la_int=large intestines, li=liver, pa=pancreas, sk=skin, sm_int=small intestines, st=stomach, th=thymus, ln=lymph nodes, ot=other, ve=venous, ar=arterial, lu=lungs, mu=muscle, sp=spleen, ad=adipose, ha=hepatic artery
+#' @name virtPop_gen
+"virtPop_gen"
+
+#' Virtual population for the monoclonal antibody PBPK model
+#'
+#' A list of lists with the physiological data for the virtual population of 1000 subjects to be used for monoclonal antibody PBPK modeling.
+#'
+#' @format A list of lists with a length of 1000 IDs for the upper level and of 68 for the nested lists
+#' \describe{
+#'   \item{ID}{Subject ID}
+#'   \item{AGE}{Age, in years}
+#'   \item{SEX}{Sex; 1=male and 2=female}
+#'   \item{BW}{Body weight, in kg}
+#'   \item{HT}{Height, in m}
+#'   \item{BMI}{Body mass index, in kg/m^2}
+#'   ...
+#' }
+#' @details Prefix: V=volume, PLQ=flow
+#' @details Suffix: V=plasma volume, IS=interstitial volume
+#' @details Abbreviation: LI=large intestines, SI=small intestines
+#' @name virtPop_mab
+"virtPop_mab"
 

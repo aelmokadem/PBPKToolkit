@@ -55,7 +55,7 @@ ggplot(data=df_Kps2, aes(Parameter, Value)) +
   geom_col() + theme_bw()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](man/figures/README-calcKp-1.png)<!-- -->
 
 ## Calculate blood:plasma concentration ratio (BP)
 
@@ -77,13 +77,13 @@ bases, and neutrals) together.
 calcBP(fup = fup, method = 1)
 ```
 
-    ## [1] 0.827023
+    . [1] 0.827023
 
 ``` r
 calcBP(logP = logP, fup = fup, method = 2)
 ```
 
-    ## [1] 1.034007
+    . [1] 1.034007
 
 ## Calculate unbound fraction in plasma (fup)
 
@@ -97,7 +97,7 @@ lipophilicity like logD) based on the method reported
 calcFup(logP = logP)
 ```
 
-    ## [1] 0.2931778
+    . [1] 0.2931778
 
 # Generate system-specific parameters
 
@@ -151,7 +151,7 @@ plot_flows <- ggplot(data=df_indPars2 %>% filter(grepl("Q", Parameter)), aes(Par
 plot_grid(plot_vols, plot_flows, ncol=1)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-genInd-1.png)<!-- -->
 
 The function `genPop` takes ranges of ages, and two ranges of body
 weights, heights, or BMIs as well as the percentage of females in the
@@ -189,7 +189,7 @@ plot_corr_flows <- ggcorr(df_flows %>% select(-SEX, -AGE, -BW, -HT, -Qot)) + lab
 plot_grid(plot_corr_vols, plot_corr_flows, ncol=2)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-genPop-1.png)<!-- -->
 
 # Monoclonal antibody PBPK modeling
 
@@ -219,17 +219,17 @@ df_indPars <- bind_rows(indPars)
 head(t(df_indPars), 10)
 ```
 
-    ##                [,1]
-    ## SEX        1.000000
-    ## BW        73.000000
-    ## HT         1.760000
-    ## BMI       23.566632
-    ## V_Heart    0.366579
-    ## V_Lung     1.152143
-    ## V_Muscle  28.748212
-    ## V_Skin     3.249019
-    ## V_Adipose 16.829509
-    ## V_Bone    10.575605
+    .                [,1]
+    . SEX        1.000000
+    . BW        73.000000
+    . HT         1.760000
+    . BMI       23.566632
+    . V_Heart    0.366579
+    . V_Lung     1.152143
+    . V_Muscle  28.748212
+    . V_Skin     3.249019
+    . V_Adipose 16.829509
+    . V_Bone    10.575605
 
 ## Generate population physiological parameters
 
@@ -252,24 +252,24 @@ df_popPars <- bind_rows(popPars) %>% select(ID, everything())
 summary(df_popPars[,1:11])
 ```
 
-    ##        ID             SEX            BW              HT             BMI       
-    ##  Min.   : 1.00   Min.   :1.0   Min.   :52.30   Min.   :1.535   Min.   :19.16  
-    ##  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:61.94   1st Qu.:1.591   1st Qu.:23.45  
-    ##  Median :20.50   Median :1.5   Median :77.78   Median :1.665   Median :27.60  
-    ##  Mean   :20.50   Mean   :1.5   Mean   :75.85   Mean   :1.668   Mean   :27.36  
-    ##  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:85.52   3rd Qu.:1.726   3rd Qu.:31.39  
-    ##  Max.   :40.00   Max.   :2.0   Max.   :99.47   Max.   :1.852   Max.   :39.26  
-    ##     V_Heart           V_Lung          V_Muscle         V_Skin     
-    ##  Min.   :0.2403   Min.   :0.6879   Min.   :16.52   Min.   :1.641  
-    ##  1st Qu.:0.2627   1st Qu.:0.7860   1st Qu.:17.66   1st Qu.:1.945  
-    ##  Median :0.3188   Median :1.0206   Median :22.60   Median :2.718  
-    ##  Mean   :0.3181   Mean   :0.9829   Mean   :23.33   Mean   :2.640  
-    ##  3rd Qu.:0.3716   3rd Qu.:1.1632   3rd Qu.:29.22   3rd Qu.:3.264  
-    ##  Max.   :0.3989   Max.   :1.2332   Max.   :29.77   Max.   :3.738  
-    ##    V_Adipose         V_Bone      
-    ##  Min.   : 5.75   Min.   : 6.822  
-    ##  1st Qu.:19.61   1st Qu.: 7.456  
-    ##  Median :25.27   Median : 9.141  
-    ##  Mean   :27.92   Mean   : 8.954  
-    ##  3rd Qu.:39.81   3rd Qu.:10.246  
-    ##  Max.   :57.09   Max.   :12.027
+    .        ID             SEX            BW              HT             BMI       
+    .  Min.   : 1.00   Min.   :1.0   Min.   :52.89   Min.   :1.518   Min.   :19.21  
+    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:66.01   1st Qu.:1.618   1st Qu.:22.87  
+    .  Median :20.50   Median :1.5   Median :79.66   Median :1.689   Median :26.23  
+    .  Mean   :20.50   Mean   :1.5   Mean   :76.91   Mean   :1.690   Mean   :26.99  
+    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:84.35   3rd Qu.:1.751   3rd Qu.:30.69  
+    .  Max.   :40.00   Max.   :2.0   Max.   :97.84   Max.   :1.891   Max.   :34.88  
+    .     V_Heart           V_Lung          V_Muscle         V_Skin     
+    .  Min.   :0.2408   Min.   :0.6920   Min.   :16.61   Min.   :1.653  
+    .  1st Qu.:0.2606   1st Qu.:0.7514   1st Qu.:17.47   1st Qu.:1.897  
+    .  Median :0.3094   Median :0.9923   Median :22.75   Median :2.589  
+    .  Mean   :0.3180   Mean   :0.9802   Mean   :23.20   Mean   :2.652  
+    .  3rd Qu.:0.3722   3rd Qu.:1.1643   3rd Qu.:29.07   3rd Qu.:3.303  
+    .  Max.   :0.4072   Max.   :1.2535   Max.   :29.93   Max.   :3.887  
+    .    V_Adipose          V_Bone      
+    .  Min.   : 8.462   Min.   : 6.891  
+    .  1st Qu.:19.919   1st Qu.: 7.672  
+    .  Median :25.223   Median : 8.784  
+    .  Mean   :28.862   Mean   : 9.151  
+    .  3rd Qu.:39.408   3rd Qu.:10.515  
+    .  Max.   :55.480   Max.   :12.562

@@ -16,6 +16,14 @@ library(cowplot)
 library(GGally)
 ```
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  comment = ".",
+  fig.path = "man/figures/README-"
+)
+options(tibble.print_min = 5, tibble.print_max = 5)
+```
+
 # Generate drug-specific parameters
 
 ## Calculate tissue:plasma partition coefficients (Kp)
@@ -30,7 +38,7 @@ The function `calcKp` can calculate the molecule's Kp values for different organ
 
 The function uses the unified tissue composition data reported in https://dmd.aspetjournals.org/content/48/10/903
 
-```{r}
+```{r, calcKp}
 # define molecule's physicochemical properties
 logP <- 2  #lipophilicity
 pKa <- 1  #acidic strength
@@ -57,7 +65,7 @@ In case BP parameter was missing, the function `calcBP` can be used to calculate
 
 Note: drug type = "total" is the default type and it uses the regression coefficients calculated by fitting different molecule types (acids, bases, and neutrals) together.
 
-```{r}
+```{r, calcBP}
 # in case BP parameter was missing, the function calcBP
 calcBP(fup = fup, method = 1)
 calcBP(logP = logP, fup = fup, method = 2)
@@ -67,7 +75,7 @@ calcBP(logP = logP, fup = fup, method = 2)
 
 In case fup parameter was missing, the function `calcFup` can be used to calculate fup using the molecule's logP (or another measurement of lipophilicity like logD) based on the method reported [here](https://pubmed.ncbi.nlm.nih.gov/20549836/). 
 
-```{r}
+```{r, calcFup}
 # in case BP parameter was missing, the function calcBP
 calcFup(logP = logP)
 ```
@@ -86,7 +94,7 @@ Two functions `genInd` and `genPop` can be used to generate a virtual individual
 
 The function `genInd` takes age, sex, and two inputs of body weight, height, and BMI. It returns a named list of the covariates and the physiologic parameters with volumes prefixed with `V` and flows prefixed with `Q`. The logical argument `optimize` states if the user wants to run an additional optimization step on the generated organ volumes. This step would give better parameter predictions but will take longer to run. 
 
-```{r}
+```{r, genInd}
 # define the individual demographics
 ## You only need to define two of the three covariates: body weight, height, and BMI
 age <- 30
@@ -107,7 +115,7 @@ plot_grid(plot_vols, plot_flows, ncol=1)
 
 The function `genPop` takes ranges of ages, and two ranges of body weights, heights, or BMIs as well as the percentage of females in the desired population. It returns a named list of lists with the upper level being the individuals' IDs and the nested list is each individual's covariates and physiologic parameters.
 
-```{r}
+```{r, genPop}
 # define the population demographics
 ## You only need to define the range for two of the three covariates: body weight, height, and BMI
 nSubj <- 40  #number of subjects
@@ -141,7 +149,7 @@ plot_grid(plot_corr_vols, plot_corr_flows, ncol=2)
 
 The functions `genInd_mab` and `genPop_mab` take the same inputs as `genInd` and `genPop`, respectively, but they return physiologic parameters to be used for monoclonal antibody (mAb) PBPK modeling. The parameter names are consistent with the names used in the mAb PBPK model developed [here](https://github.com/metrumresearchgroup/bioPBPK/tree/main/mAb_bamlanivimab) and was based on the model reported by Shah and Betts 2012 ([source](https://pubmed.ncbi.nlm.nih.gov/22143261/)) and Jones et al 2019 ([source](https://ascpt.onlinelibrary.wiley.com/doi/full/10.1002/psp4.12461)).  
 
-```{r}
+```{r, genInd_mab}
 # define the individual demographics
 ## You only need to define two of the three covariates: body weight, height, and BMI
 age <- 30
@@ -158,7 +166,7 @@ head(t(df_indPars), 10)
 
 ## Generate population physiological parameters
 
-```{r}
+```{r, genPop_mab}
 # define the population demographics
 ## You only need to define the range for two of the three covariates: body weight, height, and BMI
 nSubj <- 40  #number of subjects
