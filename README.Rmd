@@ -36,7 +36,7 @@ The function `calcKp` can calculate the molecule's Kp values for different organ
 - Schmitt: Schimtt ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
 - pksim: PK-Sim ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
 
-The function uses the unified tissue composition data reported in https://dmd.aspetjournals.org/content/48/10/903
+The function uses the unified tissue composition data reported [here](https://dmd.aspetjournals.org/content/48/10/903) 
 
 ```{r, calcKp}
 # define molecule's physicochemical properties
