@@ -34,8 +34,8 @@ different organs using one of five different calculation methods:
   - pksim: PK-Sim
     ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
 
-The function uses the unified tissue composition data reported in
-<https://dmd.aspetjournals.org/content/48/10/903>
+The function uses the unified tissue composition data reported
+[here](https://dmd.aspetjournals.org/content/48/10/903)
 
 ``` r
 # define molecule's physicochemical properties
@@ -253,23 +253,23 @@ summary(df_popPars[,1:11])
 ```
 
     .        ID             SEX            BW              HT             BMI       
-    .  Min.   : 1.00   Min.   :1.0   Min.   :52.89   Min.   :1.518   Min.   :19.21  
-    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:66.01   1st Qu.:1.618   1st Qu.:22.87  
-    .  Median :20.50   Median :1.5   Median :79.66   Median :1.689   Median :26.23  
-    .  Mean   :20.50   Mean   :1.5   Mean   :76.91   Mean   :1.690   Mean   :26.99  
-    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:84.35   3rd Qu.:1.751   3rd Qu.:30.69  
-    .  Max.   :40.00   Max.   :2.0   Max.   :97.84   Max.   :1.891   Max.   :34.88  
+    .  Min.   : 1.00   Min.   :1.0   Min.   :50.35   Min.   :1.511   Min.   :20.15  
+    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:65.66   1st Qu.:1.580   1st Qu.:23.58  
+    .  Median :20.50   Median :1.5   Median :74.81   Median :1.669   Median :26.50  
+    .  Mean   :20.50   Mean   :1.5   Mean   :74.18   Mean   :1.659   Mean   :27.09  
+    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:80.77   3rd Qu.:1.729   3rd Qu.:29.90  
+    .  Max.   :40.00   Max.   :2.0   Max.   :99.06   Max.   :1.815   Max.   :38.49  
     .     V_Heart           V_Lung          V_Muscle         V_Skin     
-    .  Min.   :0.2408   Min.   :0.6920   Min.   :16.61   Min.   :1.653  
-    .  1st Qu.:0.2606   1st Qu.:0.7514   1st Qu.:17.47   1st Qu.:1.897  
-    .  Median :0.3094   Median :0.9923   Median :22.75   Median :2.589  
-    .  Mean   :0.3180   Mean   :0.9802   Mean   :23.20   Mean   :2.652  
-    .  3rd Qu.:0.3722   3rd Qu.:1.1643   3rd Qu.:29.07   3rd Qu.:3.303  
-    .  Max.   :0.4072   Max.   :1.2535   Max.   :29.93   Max.   :3.887  
+    .  Min.   :0.2420   Min.   :0.6780   Min.   :16.68   Min.   :1.622  
+    .  1st Qu.:0.2646   1st Qu.:0.7832   1st Qu.:17.64   1st Qu.:1.979  
+    .  Median :0.3045   Median :0.9780   Median :22.34   Median :2.485  
+    .  Mean   :0.3120   Mean   :0.9622   Mean   :23.11   Mean   :2.553  
+    .  3rd Qu.:0.3658   3rd Qu.:1.1479   3rd Qu.:28.91   3rd Qu.:3.185  
+    .  Max.   :0.3931   Max.   :1.2183   Max.   :29.83   Max.   :3.606  
     .    V_Adipose          V_Bone      
-    .  Min.   : 8.462   Min.   : 6.891  
-    .  1st Qu.:19.919   1st Qu.: 7.672  
-    .  Median :25.223   Median : 8.784  
-    .  Mean   :28.862   Mean   : 9.151  
-    .  3rd Qu.:39.408   3rd Qu.:10.515  
-    .  Max.   :55.480   Max.   :12.562
+    .  Min.   : 7.406   Min.   : 6.528  
+    .  1st Qu.:18.867   1st Qu.: 7.420  
+    .  Median :23.761   Median : 8.648  
+    .  Mean   :26.872   Mean   : 8.783  
+    .  3rd Qu.:35.088   3rd Qu.:10.250  
+    .  Max.   :58.192   Max.   :11.436
