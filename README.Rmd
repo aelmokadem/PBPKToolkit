@@ -24,62 +24,6 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 5, tibble.print_max = 5)
 ```
 
-# Generate drug-specific parameters
-
-## Calculate tissue:plasma partition coefficients (Kp)
-
-The function `calcKp` can calculate the molecule's Kp values for different organs using one of five different calculation methods:
-
-- PT: Poulin and Theil ([source](https://pubmed.ncbi.nlm.nih.gov/11782904/)).
-- RR: Rodgers and Rowland ([source1](https://pubmed.ncbi.nlm.nih.gov/15858854/) and [source2](https://pubmed.ncbi.nlm.nih.gov/16639716/)).
-- Berez: Berezhkovskiy ([source](https://pubmed.ncbi.nlm.nih.gov/15124219/)).
-- Schmitt: Schimtt ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
-- pksim: PK-Sim ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
-
-The function uses the unified tissue composition data reported [here](https://dmd.aspetjournals.org/content/48/10/903) 
-
-```{r, calcKp}
-# define molecule's physicochemical properties
-logP <- 2  #lipophilicity
-pKa <- 1  #acidic strength
-type <- 3  #type of molecule
-BP <- 1  #blood:plasma concentration ratio
-fup <- 0.5  #unbound fraction in plasma
-method <- "PT"  #prediction method
-
-# calculate partition coefficients
-Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
-df_Kps <- bind_rows(Kps)
-df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
-
-ggplot(data=df_Kps2, aes(Parameter, Value)) +
-  geom_col() + theme_bw()
-```
-
-## Calculate blood:plasma concentration ratio (BP)
-
-In case BP parameter was missing, the function `calcBP` can be used to calculate BP based on the methods reported [here](https://pubmed.ncbi.nlm.nih.gov/20549836/). There are two methods to chose from:
-
-- Method 1: uses molecule's fup to calculate BP.
-- Method 2: uses molecule's logP (or another measurement of lipophilicity like logD) to calculate BP.
-
-Note: drug type = "total" is the default type and it uses the regression coefficients calculated by fitting different molecule types (acids, bases, and neutrals) together.
-
-```{r, calcBP}
-# in case BP parameter was missing, the function calcBP
-calcBP(fup = fup, method = 1)
-calcBP(logP = logP, fup = fup, method = 2)
-```
-
-## Calculate unbound fraction in plasma (fup)
-
-In case fup parameter was missing, the function `calcFup` can be used to calculate fup using the molecule's logP (or another measurement of lipophilicity like logD) based on the method reported [here](https://pubmed.ncbi.nlm.nih.gov/20549836/). 
-
-```{r, calcFup}
-# in case BP parameter was missing, the function calcBP
-calcFup(logP = logP)
-```
-
 # Generate system-specific parameters
 
 System-related (physiologic) parameters required for PBPK modeling are the organ volumes and blood flows. There are two versions of the functions that generate the physiologic parameters, a version to be applied for general PBPK modeling of small molecules and another specific for monoclonal antibody PBPK modeling.  
@@ -185,4 +129,74 @@ df_popPars <- bind_rows(popPars) %>% select(ID, everything())
 summary(df_popPars[,1:11])
 ```
 
+# Generate drug-specific parameters
 
+## Calculate tissue:plasma partition coefficients (Kp)
+
+The function `calcKp` can calculate the molecule's Kp values for different organs using one of five different calculation methods:
+
+- PT: Poulin and Theil ([source](https://pubmed.ncbi.nlm.nih.gov/11782904/)).
+- RR: Rodgers and Rowland ([source1](https://pubmed.ncbi.nlm.nih.gov/15858854/) and [source2](https://pubmed.ncbi.nlm.nih.gov/16639716/)).
+- Berez: Berezhkovskiy ([source](https://pubmed.ncbi.nlm.nih.gov/15124219/)).
+- Schmitt: Schimtt ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
+- pksim: PK-Sim ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
+
+The function uses the unified tissue composition data reported [here](https://dmd.aspetjournals.org/content/48/10/903) 
+
+```{r, calcKp}
+# define molecule's physicochemical properties
+logP <- 2  #lipophilicity
+pKa <- 1  #acidic strength
+type <- 3  #type of molecule
+BP <- 1  #blood:plasma concentration ratio
+fup <- 0.5  #unbound fraction in plasma
+method <- "PT"  #prediction method
+
+# calculate partition coefficients
+Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
+df_Kps <- bind_rows(Kps)
+df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
+
+ggplot(data=df_Kps2, aes(Parameter, Value)) +
+  geom_col() + theme_bw()
+```
+## Calculate tissue:plasma partition coefficients (Kp) using volume at steady state (Vss)
+
+If Vss is available, it can be passed to the argument `Vss` of the `calcKp` function that will then scale the calculated Kp values accordingly. If `Vss` is provided, the named list containing the individual's physiological parameters also need to be passed to the argument `Vt`. `calcKp` will grab the tissue volumes from this list to allow for the scaling of the Kp values based on the Vss calculation here https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0054-x.
+
+```{r, calcKp2}
+# calculate partition coefficients
+Vss <- 50
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FALSE)
+Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method, Vss=Vss, Vt=indPars)
+df_Kps <- bind_rows(Kps)
+df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
+
+ggplot(data=df_Kps2, aes(Parameter, Value)) +
+  geom_col() + theme_bw()
+```
+
+
+## Calculate blood:plasma concentration ratio (BP)
+
+In case BP parameter was missing, the function `calcBP` can be used to calculate BP based on the methods reported [here](https://pubmed.ncbi.nlm.nih.gov/20549836/). There are two methods to chose from:
+
+- Method 1: uses molecule's fup to calculate BP.
+- Method 2: uses molecule's logP (or another measurement of lipophilicity like logD) to calculate BP.
+
+Note: drug type = "total" is the default type and it uses the regression coefficients calculated by fitting different molecule types (acids, bases, and neutrals) together.
+
+```{r, calcBP}
+# in case BP parameter was missing, the function calcBP
+calcBP(fup = fup, method = 1)
+calcBP(logP = logP, fup = fup, method = 2)
+```
+
+## Calculate unbound fraction in plasma (fup)
+
+In case fup parameter was missing, the function `calcFup` can be used to calculate fup using the molecule's logP (or another measurement of lipophilicity like logD) based on the method reported [here](https://pubmed.ncbi.nlm.nih.gov/20549836/). 
+
+```{r, calcFup}
+# in case BP parameter was missing, the function calcBP
+calcFup(logP = logP)
+```

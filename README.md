@@ -15,90 +15,6 @@ library(cowplot)
 library(GGally)
 ```
 
-# Generate drug-specific parameters
-
-## Calculate tissue:plasma partition coefficients (Kp)
-
-The function `calcKp` can calculate the molecule’s Kp values for
-different organs using one of five different calculation methods:
-
-  - PT: Poulin and Theil
-    ([source](https://pubmed.ncbi.nlm.nih.gov/11782904/)).
-  - RR: Rodgers and Rowland
-    ([source1](https://pubmed.ncbi.nlm.nih.gov/15858854/) and
-    [source2](https://pubmed.ncbi.nlm.nih.gov/16639716/)).
-  - Berez: Berezhkovskiy
-    ([source](https://pubmed.ncbi.nlm.nih.gov/15124219/)).
-  - Schmitt: Schimtt
-    ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
-  - pksim: PK-Sim
-    ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
-
-The function uses the unified tissue composition data reported
-[here](https://dmd.aspetjournals.org/content/48/10/903)
-
-``` r
-# define molecule's physicochemical properties
-logP <- 2  #lipophilicity
-pKa <- 1  #acidic strength
-type <- 3  #type of molecule
-BP <- 1  #blood:plasma concentration ratio
-fup <- 0.5  #unbound fraction in plasma
-method <- "PT"  #prediction method
-
-# calculate partition coefficients
-Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
-df_Kps <- bind_rows(Kps)
-df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
-
-ggplot(data=df_Kps2, aes(Parameter, Value)) +
-  geom_col() + theme_bw()
-```
-
-![](man/figures/README-calcKp-1.png)<!-- -->
-
-## Calculate blood:plasma concentration ratio (BP)
-
-In case BP parameter was missing, the function `calcBP` can be used to
-calculate BP based on the methods reported
-[here](https://pubmed.ncbi.nlm.nih.gov/20549836/). There are two methods
-to chose from:
-
-  - Method 1: uses molecule’s fup to calculate BP.
-  - Method 2: uses molecule’s logP (or another measurement of
-    lipophilicity like logD) to calculate BP.
-
-Note: drug type = “total” is the default type and it uses the regression
-coefficients calculated by fitting different molecule types (acids,
-bases, and neutrals) together.
-
-``` r
-# in case BP parameter was missing, the function calcBP
-calcBP(fup = fup, method = 1)
-```
-
-    . [1] 0.827023
-
-``` r
-calcBP(logP = logP, fup = fup, method = 2)
-```
-
-    . [1] 1.034007
-
-## Calculate unbound fraction in plasma (fup)
-
-In case fup parameter was missing, the function `calcFup` can be used to
-calculate fup using the molecule’s logP (or another measurement of
-lipophilicity like logD) based on the method reported
-[here](https://pubmed.ncbi.nlm.nih.gov/20549836/).
-
-``` r
-# in case BP parameter was missing, the function calcBP
-calcFup(logP = logP)
-```
-
-    . [1] 0.2931778
-
 # Generate system-specific parameters
 
 System-related (physiologic) parameters required for PBPK modeling are
@@ -253,23 +169,131 @@ summary(df_popPars[,1:11])
 ```
 
     .        ID             SEX            BW              HT             BMI       
-    .  Min.   : 1.00   Min.   :1.0   Min.   :50.35   Min.   :1.511   Min.   :20.15  
-    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:65.66   1st Qu.:1.580   1st Qu.:23.58  
-    .  Median :20.50   Median :1.5   Median :74.81   Median :1.669   Median :26.50  
-    .  Mean   :20.50   Mean   :1.5   Mean   :74.18   Mean   :1.659   Mean   :27.09  
-    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:80.77   3rd Qu.:1.729   3rd Qu.:29.90  
-    .  Max.   :40.00   Max.   :2.0   Max.   :99.06   Max.   :1.815   Max.   :38.49  
+    .  Min.   : 1.00   Min.   :1.0   Min.   :55.10   Min.   :1.511   Min.   :19.39  
+    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:68.77   1st Qu.:1.624   1st Qu.:23.13  
+    .  Median :20.50   Median :1.5   Median :76.32   Median :1.686   Median :26.37  
+    .  Mean   :20.50   Mean   :1.5   Mean   :75.04   Mean   :1.690   Mean   :26.41  
+    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:80.99   3rd Qu.:1.759   3rd Qu.:28.83  
+    .  Max.   :40.00   Max.   :2.0   Max.   :93.37   Max.   :1.866   Max.   :34.66  
     .     V_Heart           V_Lung          V_Muscle         V_Skin     
-    .  Min.   :0.2420   Min.   :0.6780   Min.   :16.68   Min.   :1.622  
-    .  1st Qu.:0.2646   1st Qu.:0.7832   1st Qu.:17.64   1st Qu.:1.979  
-    .  Median :0.3045   Median :0.9780   Median :22.34   Median :2.485  
-    .  Mean   :0.3120   Mean   :0.9622   Mean   :23.11   Mean   :2.553  
-    .  3rd Qu.:0.3658   3rd Qu.:1.1479   3rd Qu.:28.91   3rd Qu.:3.185  
-    .  Max.   :0.3931   Max.   :1.2183   Max.   :29.83   Max.   :3.606  
+    .  Min.   :0.2352   Min.   :0.6672   Min.   :16.54   Min.   :1.570  
+    .  1st Qu.:0.2571   1st Qu.:0.7434   1st Qu.:17.53   1st Qu.:1.852  
+    .  Median :0.3089   Median :0.9927   Median :22.50   Median :2.587  
+    .  Mean   :0.3150   Mean   :0.9664   Mean   :23.09   Mean   :2.613  
+    .  3rd Qu.:0.3745   3rd Qu.:1.1710   3rd Qu.:29.08   3rd Qu.:3.323  
+    .  Max.   :0.3973   Max.   :1.2295   Max.   :29.73   Max.   :3.737  
     .    V_Adipose          V_Bone      
-    .  Min.   : 7.406   Min.   : 6.528  
-    .  1st Qu.:18.867   1st Qu.: 7.420  
-    .  Median :23.761   Median : 8.648  
-    .  Mean   :26.872   Mean   : 8.783  
-    .  3rd Qu.:35.088   3rd Qu.:10.250  
-    .  Max.   :58.192   Max.   :11.436
+    .  Min.   : 7.931   Min.   : 6.463  
+    .  1st Qu.:18.355   1st Qu.: 7.625  
+    .  Median :26.958   Median : 9.028  
+    .  Mean   :27.244   Mean   : 9.124  
+    .  3rd Qu.:35.320   3rd Qu.:10.629  
+    .  Max.   :54.565   Max.   :12.136
+
+# Generate drug-specific parameters
+
+## Calculate tissue:plasma partition coefficients (Kp)
+
+The function `calcKp` can calculate the molecule’s Kp values for
+different organs using one of five different calculation methods:
+
+  - PT: Poulin and Theil
+    ([source](https://pubmed.ncbi.nlm.nih.gov/11782904/)).
+  - RR: Rodgers and Rowland
+    ([source1](https://pubmed.ncbi.nlm.nih.gov/15858854/) and
+    [source2](https://pubmed.ncbi.nlm.nih.gov/16639716/)).
+  - Berez: Berezhkovskiy
+    ([source](https://pubmed.ncbi.nlm.nih.gov/15124219/)).
+  - Schmitt: Schimtt
+    ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
+  - pksim: PK-Sim
+    ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
+
+The function uses the unified tissue composition data reported
+[here](https://dmd.aspetjournals.org/content/48/10/903)
+
+``` r
+# define molecule's physicochemical properties
+logP <- 2  #lipophilicity
+pKa <- 1  #acidic strength
+type <- 3  #type of molecule
+BP <- 1  #blood:plasma concentration ratio
+fup <- 0.5  #unbound fraction in plasma
+method <- "PT"  #prediction method
+
+# calculate partition coefficients
+Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
+df_Kps <- bind_rows(Kps)
+df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
+
+ggplot(data=df_Kps2, aes(Parameter, Value)) +
+  geom_col() + theme_bw()
+```
+
+![](man/figures/README-calcKp-1.png)<!-- --> \#\# Calculate
+tissue:plasma partition coefficients (Kp) using volume at steady state
+(Vss)
+
+If Vss is available, it can be passed to the argument `Vss` of the
+`calcKp` function that will then scale the calculated Kp values
+accordingly. If `Vss` is provided, the named list containing the
+individual’s physiological parameters also need to be passed to the
+argument `Vt`. `calcKp` will grab the tissue volumes from this list to
+allow for the scaling of the Kp values based on the Vss calculation here
+<https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0054-x>.
+
+``` r
+# calculate partition coefficients
+Vss <- 50
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FALSE)
+Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method, Vss=Vss, Vt=indPars)
+df_Kps <- bind_rows(Kps)
+df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
+
+ggplot(data=df_Kps2, aes(Parameter, Value)) +
+  geom_col() + theme_bw()
+```
+
+![](man/figures/README-calcKp2-1.png)<!-- -->
+
+## Calculate blood:plasma concentration ratio (BP)
+
+In case BP parameter was missing, the function `calcBP` can be used to
+calculate BP based on the methods reported
+[here](https://pubmed.ncbi.nlm.nih.gov/20549836/). There are two methods
+to chose from:
+
+  - Method 1: uses molecule’s fup to calculate BP.
+  - Method 2: uses molecule’s logP (or another measurement of
+    lipophilicity like logD) to calculate BP.
+
+Note: drug type = “total” is the default type and it uses the regression
+coefficients calculated by fitting different molecule types (acids,
+bases, and neutrals) together.
+
+``` r
+# in case BP parameter was missing, the function calcBP
+calcBP(fup = fup, method = 1)
+```
+
+    . [1] 0.827023
+
+``` r
+calcBP(logP = logP, fup = fup, method = 2)
+```
+
+    . [1] 1.034007
+
+## Calculate unbound fraction in plasma (fup)
+
+In case fup parameter was missing, the function `calcFup` can be used to
+calculate fup using the molecule’s logP (or another measurement of
+lipophilicity like logD) based on the method reported
+[here](https://pubmed.ncbi.nlm.nih.gov/20549836/).
+
+``` r
+# in case BP parameter was missing, the function calcBP
+calcFup(logP = logP)
+```
+
+    . [1] 0.2931778
