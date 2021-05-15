@@ -2,11 +2,11 @@
 #'
 #' Takes in desired individual demographics and generates the individual physiological parameters
 #'
-#' @param age Age of the individual
+#' @param age Age of the individual in years
 #' @param is.male if TRUE, individual is male
-#' @param bw_targ Target body weight
-#' @param ht_targ Target height
-#' @param bmi_targ Target body mass index
+#' @param bw_targ Target body weight in kg
+#' @param ht_targ Target height in m
+#' @param bmi_targ Target body mass index in kg/m^2
 #' @param optimize if TRUE, an optimization step is done
 #' @param addBC if TRUE, blood content will be added to each organ
 #' @return Named list with physiological parameters for the desired individual
@@ -151,15 +151,15 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #' Takes in desired population demographics and generates the population physiological parameters
 #'
 #' @param nSubj Number of subjects
-#' @param minAge Minimum age
-#' @param maxAge Maximum age
+#' @param minAge Minimum age in years
+#' @param maxAge Maximum age in years
 #' @param femPerc Percentage of females
-#' @param minBW Minimum body weight
-#' @param maxBW Maximum body weight
-#' @param minHT Minimum height
-#' @param maxHT Maximum height
-#' @param minBMI Minimum body mass index
-#' @param maxBMI Maximum body mass index
+#' @param minBW Minimum body weight in kg
+#' @param maxBW Maximum body weight in kg
+#' @param minHT Minimum height in m
+#' @param maxHT Maximum height in m
+#' @param minBMI Minimum body mass index in kg/m^2
+#' @param maxBMI Maximum body mass index in kg/m^2
 #' @param optimize if TRUE, an optimization step is done for each individual
 #' @param addBC if TRUE, blood content will be added to each organ
 #' @return List of named lists with physiological parameters for each individual in the population
@@ -191,11 +191,11 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
 #'
 #' Takes in desired individual demographics and generates the individual physiological parameters for the mAb model
 #'
-#' @param age Age of the individual
+#' @param age Age of the individual in years
 #' @param is.male if TRUE, individual is male
-#' @param bw_targ Target body weight
-#' @param ht_targ Target height
-#' @param bmi_targ Target body mass index
+#' @param bw_targ Target body weight in kg
+#' @param ht_targ Target height in m
+#' @param bmi_targ Target body mass index in kg/m^2
 #' @return Named list with physiological parameters for the mAb model for the desired individual
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select mutate case_when tibble
@@ -292,15 +292,15 @@ genInd_mab <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL){
 #' Takes in desired population demographics and generates the population physiological parameters for the mAb model
 #'
 #' @param nSubj Number of subjects
-#' @param minAge Minimum age
-#' @param maxAge Maximum age
+#' @param minAge Minimum age in years
+#' @param maxAge Maximum age in years
 #' @param femPerc Percentage of females
-#' @param minBW Minimum body weight
-#' @param maxBW Maximum body weight
-#' @param minHT Minimum height
-#' @param maxHT Maximum height
-#' @param minBMI Minimum body mass index
-#' @param maxBMI Maximum body mass index
+#' @param minBW Minimum body weight in kg
+#' @param maxBW Maximum body weight in kg
+#' @param minHT Minimum height in m
+#' @param maxHT Maximum height in m
+#' @param minBMI Minimum body mass index in kg/m^2
+#' @param maxBMI Maximum body mass index in kg/m^2
 #' @return List of named lists with physiological parameters for the mAb model for each individual in the population
 #' @export
 genPop_mab <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL){

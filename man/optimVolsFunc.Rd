@@ -13,9 +13,9 @@ optimVolsFunc(optVols, df_opt, df_ad, bw_targ, bw_mean, ht_rel, normOrgan)
 
 \item{df_ad}{Dataframe of adipose volume to be optimized}
 
-\item{bw_targ}{Target body weight}
+\item{bw_targ}{Target body weight in kg}
 
-\item{bw_mean}{Mean body weight}
+\item{bw_mean}{Mean body weight in kg}
 
 \item{ht_rel}{Relative height ratio}
 

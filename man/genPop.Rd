@@ -22,23 +22,23 @@ genPop(
 \arguments{
 \item{nSubj}{Number of subjects}
 
-\item{minAge}{Minimum age}
+\item{minAge}{Minimum age in years}
 
-\item{maxAge}{Maximum age}
+\item{maxAge}{Maximum age in years}
 
 \item{femPerc}{Percentage of females}
 
-\item{minBW}{Minimum body weight}
+\item{minBW}{Minimum body weight in kg}
 
-\item{maxBW}{Maximum body weight}
+\item{maxBW}{Maximum body weight in kg}
 
-\item{minHT}{Minimum height}
+\item{minHT}{Minimum height in m}
 
-\item{maxHT}{Maximum height}
+\item{maxHT}{Maximum height in m}
 
-\item{minBMI}{Minimum body mass index}
+\item{minBMI}{Minimum body mass index in kg/m^2}
 
-\item{maxBMI}{Maximum body mass index}
+\item{maxBMI}{Maximum body mass index in kg/m^2}
 
 \item{optimize}{if TRUE, an optimization step is done for each individual}
 

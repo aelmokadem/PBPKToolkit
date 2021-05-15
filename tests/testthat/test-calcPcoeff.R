@@ -1,5 +1,7 @@
 ## calcKp for different types and methods
 ref_df <- readRDS(file.path(REF_DIR, "calcKp-ref.Rds"))
+out_dir <- "calcKpRefs"
+out_dir <- file.path(system.file("test-refs", package = "mrgPBPK"), out_dir)
 
 purrr::pwalk(ref_df, ~ {
   # capture all the columns for this row as a list
@@ -80,6 +82,35 @@ test_that("calcFup", {
     calcFup(logP=1, type="total"),
     0.3479642,
     tolerance = 7
+  )
+})
+
+## scaleKp
+ref <- dget(file.path(out_dir, "scaleKp"))
+
+logP <- 2  #lipophilicity
+pKa <- 1  #acidic strength
+type <- 3  #type of molecule
+BP <- 1  #blood:plasma concentration ratio
+fup <- 0.5  #unbound fraction in plasma
+method <- "PT"  #prediction method
+Kp <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
+
+age <- 30
+ismale <- TRUE
+bw <- 73
+ht <- 1.76
+
+# generate individual physiological parameters
+set.seed(123)
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FALSE)
+
+res <- scaleKp(Kp=Kp, Vss=10, BP=BP, Vt=indPars)
+
+test_that("scaleKp", {
+  expect_equal(
+    res,
+    ref
   )
 })
 

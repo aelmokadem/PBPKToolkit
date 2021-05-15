@@ -7,11 +7,11 @@
 test_genIndInput(bw_targ, ht_targ, bmi_targ)
 }
 \arguments{
-\item{bw_targ}{Target body weight}
+\item{bw_targ}{Target body weight in kg}
 
-\item{ht_targ}{Target height}
+\item{ht_targ}{Target height in m}
 
-\item{bmi_targ}{Target BMI}
+\item{bmi_targ}{Target BMI in kg/m^2}
 }
 \value{
 An error or a warning if inputs to genInd are not compliant

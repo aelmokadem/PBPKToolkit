@@ -7,17 +7,17 @@
 test_genPopInput(minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
 }
 \arguments{
-\item{minBW}{Minimum body weight}
+\item{minBW}{Minimum body weight in kg}
 
-\item{maxBW}{Maximum body weight}
+\item{maxBW}{Maximum body weight in kg}
 
-\item{minHT}{Minimum height}
+\item{minHT}{Minimum height in m}
 
-\item{maxHT}{Maximum height}
+\item{maxHT}{Maximum height in m}
 
-\item{minBMI}{Minimum body mass index}
+\item{minBMI}{Minimum body mass index in kg/m^2}
 
-\item{maxBMI}{Maximum body mass index}
+\item{maxBMI}{Maximum body mass index in kg/m^2}
 }
 \value{
 An error or a warning if inputs to genPop are not compliant

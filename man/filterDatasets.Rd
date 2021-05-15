@@ -7,7 +7,7 @@
 filterDatasets(age, sex)
 }
 \arguments{
-\item{age}{Age}
+\item{age}{Age in years}
 
 \item{sex}{Sex}
 }

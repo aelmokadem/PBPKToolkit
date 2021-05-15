@@ -15,15 +15,15 @@ genInd(
 )
 }
 \arguments{
-\item{age}{Age of the individual}
+\item{age}{Age of the individual in years}
 
 \item{is.male}{if TRUE, individual is male}
 
-\item{bw_targ}{Target body weight}
+\item{bw_targ}{Target body weight in kg}
 
-\item{ht_targ}{Target height}
+\item{ht_targ}{Target height in m}
 
-\item{bmi_targ}{Target body mass index}
+\item{bmi_targ}{Target body mass index in kg/m^2}
 
 \item{optimize}{if TRUE, an optimization step is done}
 

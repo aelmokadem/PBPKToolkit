@@ -7,15 +7,15 @@
 genInd_mab(age, is.male, bw_targ = NULL, ht_targ = NULL, bmi_targ = NULL)
 }
 \arguments{
-\item{age}{Age of the individual}
+\item{age}{Age of the individual in years}
 
 \item{is.male}{if TRUE, individual is male}
 
-\item{bw_targ}{Target body weight}
+\item{bw_targ}{Target body weight in kg}
 
-\item{ht_targ}{Target height}
+\item{ht_targ}{Target height in m}
 
-\item{bmi_targ}{Target body mass index}
+\item{bmi_targ}{Target body mass index in kg/m^2}
 }
 \value{
 Named list with physiological parameters for the mAb model for the desired individual

@@ -7,15 +7,15 @@
 test_covRange(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI)
 }
 \arguments{
-\item{bw_targ}{Target body weight}
+\item{bw_targ}{Target body weight in kg}
 
-\item{ht_targ}{Target height}
+\item{ht_targ}{Target height in m}
 
-\item{bmi_targ}{Target BMI}
+\item{bmi_targ}{Target BMI in kg/m^2}
 
-\item{rangeBW}{Range of BMIs for the chosen age and sex}
+\item{rangeBW}{Range of BMIs in kg/m^2 for the chosen age and sex}
 
-\item{rangeHT}{Range of heights for the chosen age and sex}
+\item{rangeHT}{Range of heights in m for the chosen age and sex}
 }
 \value{
 An error message if one or more of the covariates are out of range
