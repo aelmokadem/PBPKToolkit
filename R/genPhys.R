@@ -20,9 +20,6 @@
 #source is mainly the PK-Sim Github page https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
 
 genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, optimize=FALSE, addBC=TRUE){
-  #nhanesData is nhanes anthropometric dataset; icrpData are physiological parameters from ICRP; SF is allomeric scaling factors
-  #BC is organ relative blood content
-
   ##filter nhanes database for desired age and sex
   sex <- ifelse(is.male, 1, 2)
 
