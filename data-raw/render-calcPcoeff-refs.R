@@ -1,7 +1,4 @@
 devtools::load_all()
-#' @importFrom dplyr bind_rows slice mutate
-#' @importFrom tibble tribble
-#' @importFrom purrr pmap_dfr
 
 ## calcKp
 test_cases <- tibble::tribble(
@@ -17,18 +14,18 @@ test_cases <- tibble::tribble(
   2, c(1,2,3),       9,     1,    0.5,
   2, c(1,2,3),      10,     1,    0.5
 )
-test_cases <- bind_rows(
-  mutate(test_cases, method = "PT"),
-  mutate(test_cases, method = "RR"),
-  mutate(test_cases, method = "Berez"),
-  mutate(test_cases, method = "Schmitt"),
-  mutate(slice(test_cases, 1), method = "pksim")
+test_cases <- dplyr::bind_rows(
+  dplyr::mutate(test_cases, method = "PT"),
+  dplyr::mutate(test_cases, method = "RR"),
+  dplyr::mutate(test_cases, method = "Berez"),
+  dplyr::mutate(test_cases, method = "Schmitt"),
+  dplyr::mutate(dplyr::slice(test_cases, 1), method = "pksim")
 )
 
-res_df <- pmap_dfr(test_cases, render_ref, .func=calcKp, out_dir="calcKpRefs")
+res_df <- purrr::pmap_dfr(test_cases, render_ref, .func=calcKp, out_dir="calcKpRefs")
 saveRDS(res_df, file.path(system.file("test-refs", package = "mrgPBPK"), "calcKp-ref.Rds"))
 
-## scaleKp
+## calcKp with Vss input
 out_dir <- "calcKpRefs"
 out_dir <- file.path(system.file("test-refs", package = "mrgPBPK"), out_dir)
 if(!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
