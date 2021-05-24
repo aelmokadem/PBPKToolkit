@@ -4,7 +4,7 @@
 \alias{test_genIndInput}
 \title{Test if inputs to genInd are compliant}
 \usage{
-test_genIndInput(bw_targ, ht_targ, bmi_targ)
+test_genIndInput(age, bw_targ, ht_targ, bmi_targ)
 }
 \arguments{
 \item{bw_targ}{Target body weight in kg}

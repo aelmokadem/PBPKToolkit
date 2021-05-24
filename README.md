@@ -61,8 +61,8 @@ indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FA
 df_indPars <- bind_rows(indPars) %>% select(contains(c("Q","V")))
 df_indPars2 <- tibble(Parameter=names(df_indPars), Value=as.numeric(df_indPars))
 
-plot_vols <- ggplot(data=df_indPars2 %>% filter(grepl("V", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Volumes")
-plot_flows <- ggplot(data=df_indPars2 %>% filter(grepl("Q", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Flows")
+plot_vols <- ggplot(data=df_indPars2 %>% filter(grepl("V", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Volumes", y="Volume (L)")
+plot_flows <- ggplot(data=df_indPars2 %>% filter(grepl("Q", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Flows", y="Flow rate (L/h)")
 
 plot_grid(plot_vols, plot_flows, ncol=1)
 ```
@@ -169,26 +169,26 @@ summary(df_popPars[,1:11])
 ```
 
     .        ID             SEX            BW              HT             BMI       
-    .  Min.   : 1.00   Min.   :1.0   Min.   :55.10   Min.   :1.511   Min.   :19.39  
-    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:68.77   1st Qu.:1.624   1st Qu.:23.13  
-    .  Median :20.50   Median :1.5   Median :76.32   Median :1.686   Median :26.37  
-    .  Mean   :20.50   Mean   :1.5   Mean   :75.04   Mean   :1.690   Mean   :26.41  
-    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:80.99   3rd Qu.:1.759   3rd Qu.:28.83  
-    .  Max.   :40.00   Max.   :2.0   Max.   :93.37   Max.   :1.866   Max.   :34.66  
+    .  Min.   : 1.00   Min.   :1.0   Min.   :58.24   Min.   :1.563   Min.   :19.55  
+    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:70.96   1st Qu.:1.612   1st Qu.:24.02  
+    .  Median :20.50   Median :1.5   Median :80.14   Median :1.675   Median :27.93  
+    .  Mean   :20.50   Mean   :1.5   Mean   :79.53   Mean   :1.691   Mean   :27.94  
+    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:88.24   3rd Qu.:1.763   3rd Qu.:31.40  
+    .  Max.   :40.00   Max.   :2.0   Max.   :99.64   Max.   :1.878   Max.   :36.92  
     .     V_Heart           V_Lung          V_Muscle         V_Skin     
-    .  Min.   :0.2352   Min.   :0.6672   Min.   :16.54   Min.   :1.570  
-    .  1st Qu.:0.2571   1st Qu.:0.7434   1st Qu.:17.53   1st Qu.:1.852  
-    .  Median :0.3089   Median :0.9927   Median :22.50   Median :2.587  
-    .  Mean   :0.3150   Mean   :0.9664   Mean   :23.09   Mean   :2.613  
-    .  3rd Qu.:0.3745   3rd Qu.:1.1710   3rd Qu.:29.08   3rd Qu.:3.323  
-    .  Max.   :0.3973   Max.   :1.2295   Max.   :29.73   Max.   :3.737  
+    .  Min.   :0.2441   Min.   :0.7050   Min.   :16.59   Min.   :1.701  
+    .  1st Qu.:0.2720   1st Qu.:0.8170   1st Qu.:17.74   1st Qu.:2.093  
+    .  Median :0.3048   Median :0.9803   Median :22.36   Median :2.515  
+    .  Mean   :0.3177   Mean   :0.9824   Mean   :23.16   Mean   :2.655  
+    .  3rd Qu.:0.3701   3rd Qu.:1.1598   3rd Qu.:29.02   3rd Qu.:3.282  
+    .  Max.   :0.4039   Max.   :1.2452   Max.   :29.90   Max.   :3.819  
     .    V_Adipose          V_Bone      
-    .  Min.   : 7.931   Min.   : 6.463  
-    .  1st Qu.:18.355   1st Qu.: 7.625  
-    .  Median :26.958   Median : 9.028  
-    .  Mean   :27.244   Mean   : 9.124  
-    .  3rd Qu.:35.320   3rd Qu.:10.629  
-    .  Max.   :54.565   Max.   :12.136
+    .  Min.   : 3.848   Min.   : 7.079  
+    .  1st Qu.:19.559   1st Qu.: 7.698  
+    .  Median :32.371   Median : 8.732  
+    .  Mean   :31.483   Mean   : 9.153  
+    .  3rd Qu.:42.198   3rd Qu.:10.531  
+    .  Max.   :59.287   Max.   :12.288
 
 # Generate drug-specific parameters
 
@@ -209,7 +209,7 @@ different organs using one of five different calculation methods:
   - pksim: PK-Sim
     ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
 
-The function uses the unified tissue composition data reported
+The function uses the standardized tissue composition database reported
 [here](https://dmd.aspetjournals.org/content/48/10/903)
 
 ``` r
@@ -241,6 +241,11 @@ individual’s physiological parameters also need to be passed to the
 argument `Vt`. `calcKp` will grab the tissue volumes from this list to
 allow for the scaling of the Kp values based on the Vss calculation here
 <https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0054-x>.
+This scaling also requires `Kpot`, which is the partition coefficient
+value for the “other” compartment that lumps all compartments that are
+not defined in the standardized tissue composition database. If `Kpot`
+is left as `NULL`, it will be calculated as the average of all non
+adipose tissues Kp values.
 
 ``` r
 # calculate partition coefficients

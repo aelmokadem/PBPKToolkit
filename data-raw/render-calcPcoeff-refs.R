@@ -1,5 +1,5 @@
 devtools::load_all()
-#' @importFrom dplyr bind_rows
+#' @importFrom dplyr bind_rows slice mutate
 #' @importFrom tibble tribble
 #' @importFrom purrr pmap_dfr
 
@@ -39,17 +39,18 @@ type <- 3  #type of molecule
 BP <- 1  #blood:plasma concentration ratio
 fup <- 0.5  #unbound fraction in plasma
 method <- "PT"  #prediction method
-Kp <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
+Vss <- 50
 
+# generate individual physiological parameters to pass to Vt
 age <- 30
 ismale <- TRUE
 bw <- 73
 ht <- 1.76
 
-# generate individual physiological parameters
 set.seed(123)
 indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FALSE)
 
-res <- scaleKp(Kp=Kp, Vss=10, BP=BP, Vt=indPars)
-dput(res, file.path(out_dir, "scaleKp"))
+# get result and save
+res <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method, Vss=Vss, Vt=indPars)
+dput(res, file.path(out_dir, "calcKp_Vss"))
 

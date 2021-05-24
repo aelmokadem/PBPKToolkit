@@ -51,8 +51,8 @@ indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FA
 df_indPars <- bind_rows(indPars) %>% select(contains(c("Q","V")))
 df_indPars2 <- tibble(Parameter=names(df_indPars), Value=as.numeric(df_indPars))
 
-plot_vols <- ggplot(data=df_indPars2 %>% filter(grepl("V", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Volumes")
-plot_flows <- ggplot(data=df_indPars2 %>% filter(grepl("Q", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Flows")
+plot_vols <- ggplot(data=df_indPars2 %>% filter(grepl("V", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Volumes", y="Volume (L)")
+plot_flows <- ggplot(data=df_indPars2 %>% filter(grepl("Q", Parameter)), aes(Parameter, Value)) + geom_col() + theme_bw() + labs(title = "Flows", y="Flow rate (L/h)")
 
 plot_grid(plot_vols, plot_flows, ncol=1)
 ```
@@ -141,7 +141,7 @@ The function `calcKp` can calculate the molecule's Kp values for different organ
 - Schmitt: Schimtt ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
 - pksim: PK-Sim ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
 
-The function uses the unified tissue composition data reported [here](https://dmd.aspetjournals.org/content/48/10/903) 
+The function uses the standardized tissue composition database reported [here](https://dmd.aspetjournals.org/content/48/10/903) 
 
 ```{r, calcKp}
 # define molecule's physicochemical properties
@@ -162,7 +162,7 @@ ggplot(data=df_Kps2, aes(Parameter, Value)) +
 ```
 ## Calculate tissue:plasma partition coefficients (Kp) using volume at steady state (Vss)
 
-If Vss is available, it can be passed to the argument `Vss` of the `calcKp` function that will then scale the calculated Kp values accordingly. If `Vss` is provided, the named list containing the individual's physiological parameters also need to be passed to the argument `Vt`. `calcKp` will grab the tissue volumes from this list to allow for the scaling of the Kp values based on the Vss calculation here https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0054-x.
+If Vss is available, it can be passed to the argument `Vss` of the `calcKp` function that will then scale the calculated Kp values accordingly. If `Vss` is provided, the named list containing the individual's physiological parameters also need to be passed to the argument `Vt`. `calcKp` will grab the tissue volumes from this list to allow for the scaling of the Kp values based on the Vss calculation here https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0054-x. This scaling also requires `Kpot`, which is the partition coefficient value for the "other" compartment that lumps all compartments that are not defined in the standardized tissue composition database. If `Kpot` is left as `NULL`, it will be calculated as the average of all non adipose tissues Kp values.
 
 ```{r, calcKp2}
 # calculate partition coefficients
