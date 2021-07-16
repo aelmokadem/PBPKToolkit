@@ -585,11 +585,11 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, m
     }
 
     if("try-error" %in% class(t) | is.na(vol_test)){
-      ind <- ind
       counter <- counter + 1
     }else{
       ind <- ind + 1
       counter <- 1
+      vol_test <- NA
     }
     if(counter == 100) stop("No generated physiological parameters after 100 iterations. Consider modifying input parameters")
   }

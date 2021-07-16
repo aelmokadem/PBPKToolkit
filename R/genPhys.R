@@ -42,13 +42,13 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   rangeHT <- quantile(dat$HT/100, c(0.025, 0.975))  #get the 95% range of heights
   rangeBMI <- quantile(dat$BMI, c(0.025, 0.975))  #get the 95% range of body mass index
 
-  #throw covariate range and throw an error when target measurements are out of range
+  #check covariate range and throw an error when target measurements are out of range
   test_covRange(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI)
 
   ##get mean bw, ht and bmi
   bw_mean <- exp(mean(log(dat$BW)))  #geomteric mean for lognormally distributed weights
   ht_mean <- mean(dat$HT)/100  #arithmetic mean for normally distributed heights in m
-  bmi_mean <- exp(mean(log(dat$BMI)))  #geomteric mean for lognormally distributed BMI; Jim and I think this is better
+  bmi_mean <- exp(mean(log(dat$BMI)))  #geomteric mean for lognormally distributed BMI
 
   ##get mean physiological parameters scaled by linear interpolation with height
   df2 <- df %>% select(-c(bw, ht, bsa))  #get rid of anthropometric measurements
@@ -106,7 +106,6 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
                                                         means_scaled*exp(log(std_scaled)*pert))) %>%
     mutate(pertMeans = ifelse(organ == "sk", pertMeans*sqrt((bw_targ/(bw_mean*ht_rel^2))), pertMeans))
   ad <- bw_targ - sum(df_opt$pertMeans) #compute adipose volume by subtracting current weight from target bw_targ
-  p_ad <- plnorm(ad, meanlog=log(df_ad$means_scaled), sdlog=log(df_ad$std_scaled))  #compute prob for adipose vol
 
   optVols <- df_opt$pertMeans  #initial parameter values
 
