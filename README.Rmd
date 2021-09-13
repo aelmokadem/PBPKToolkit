@@ -2,14 +2,14 @@
 output: github_document
 ---
 
-# mrgPBPK
+# PBPKToolkit
 
-mrgPBPK is an open-source R package that provides a set of functions to be used for PBPK modeling. The functions mainly generate drug- and system-specific parameters required to build a PBPK model. 
+PBPKToolkit is an open-source R package that provides a set of functions to be used for PBPK modeling. The functions mainly generate drug- and system-specific parameters required to build a PBPK model. 
 
 # Load libraries
 
 ```{r setup, warning=FALSE, message=FALSE}
-library(mrgPBPK)
+library(PBPKToolkit)
 library(dplyr)
 library(ggplot2)
 library(cowplot)

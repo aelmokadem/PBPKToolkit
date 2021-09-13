@@ -1,1 +1,1 @@
-REF_DIR <- system.file("test-refs", package = "mrgPBPK")
+REF_DIR <- system.file("test-refs", package = "PBPKToolkit")

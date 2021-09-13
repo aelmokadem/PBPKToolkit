@@ -1,4 +1,4 @@
 library(testthat)
-library(mrgPBPK)
+library(PBPKToolkit)
 
-test_check("mrgPBPK")
+test_check("PBPKToolkit")

@@ -1,5 +1,5 @@
 out_dir <- "genPhysRefs"
-out_dir <- file.path(system.file("test-refs", package = "mrgPBPK"), out_dir)
+out_dir <- file.path(system.file("test-refs", package = "PBPKToolkit"), out_dir)
 if(!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
 
 ## genInd with adding BC

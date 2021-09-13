@@ -1,7 +1,7 @@
 ## calcKp for different types and methods
 ref_df <- readRDS(file.path(REF_DIR, "calcKp-ref.Rds"))
 out_dir <- "calcKpRefs"
-out_dir <- file.path(system.file("test-refs", package = "mrgPBPK"), out_dir)
+out_dir <- file.path(system.file("test-refs", package = "PBPKToolkit"), out_dir)
 
 purrr::pwalk(ref_df, ~ {
   # capture all the columns for this row as a list

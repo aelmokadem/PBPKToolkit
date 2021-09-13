@@ -23,11 +23,11 @@ test_cases <- dplyr::bind_rows(
 )
 
 res_df <- purrr::pmap_dfr(test_cases, render_ref, .func=calcKp, out_dir="calcKpRefs")
-saveRDS(res_df, file.path(system.file("test-refs", package = "mrgPBPK"), "calcKp-ref.Rds"))
+saveRDS(res_df, file.path(system.file("test-refs", package = "PBPKToolkit"), "calcKp-ref.Rds"))
 
 ## calcKp with Vss input
 out_dir <- "calcKpRefs"
-out_dir <- file.path(system.file("test-refs", package = "mrgPBPK"), out_dir)
+out_dir <- file.path(system.file("test-refs", package = "PBPKToolkit"), out_dir)
 if(!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
 
 logP <- 2  #lipophilicity
