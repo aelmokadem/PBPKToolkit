@@ -1,14 +1,14 @@
 
-# mrgPBPK
+# PBPKToolkit
 
-mrgPBPK is an open-source R package that provides a set of functions to
-be used for PBPK modeling. The functions mainly generate drug- and
+PBPKToolkit is an open-source R package that provides a set of functions
+to be used for PBPK modeling. The functions mainly generate drug- and
 system-specific parameters required to build a PBPK model.
 
 # Load libraries
 
 ``` r
-library(mrgPBPK)
+library(PBPKToolkit)
 library(dplyr)
 library(ggplot2)
 library(cowplot)
@@ -33,11 +33,11 @@ correlation between the physiologic parameters and the sampled
 individual’s covariates to generate realistic individuals. The algorithm
 is guided by these databases:
 
-  - NHANES data for anthropometric data
+-   NHANES data for anthropometric data
     ([source](https://www.cdc.gov/nchs/nhanes/index.htm)).
-  - ICRP data for physiologic parameters of typical individuals
+-   ICRP data for physiologic parameters of typical individuals
     ([source](https://journals.sagepub.com/doi/pdf/10.1177/ANIB_32_3-4)).
-  - Willmann et al 2007 data for organ variability
+-   Willmann et al 2007 data for organ variability
     ([source](https://pubmed.ncbi.nlm.nih.gov/17431751/)).
 
 The function `genInd` takes age, sex, and two inputs of body weight,
@@ -169,26 +169,26 @@ summary(df_popPars[,1:11])
 ```
 
     .        ID             SEX            BW              HT             BMI       
-    .  Min.   : 1.00   Min.   :1.0   Min.   :58.24   Min.   :1.563   Min.   :19.55  
-    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:70.96   1st Qu.:1.612   1st Qu.:24.02  
-    .  Median :20.50   Median :1.5   Median :80.14   Median :1.675   Median :27.93  
-    .  Mean   :20.50   Mean   :1.5   Mean   :79.53   Mean   :1.691   Mean   :27.94  
-    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:88.24   3rd Qu.:1.763   3rd Qu.:31.40  
-    .  Max.   :40.00   Max.   :2.0   Max.   :99.64   Max.   :1.878   Max.   :36.92  
+    .  Min.   : 1.00   Min.   :1.0   Min.   :55.47   Min.   :1.511   Min.   :21.23  
+    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:74.44   1st Qu.:1.619   1st Qu.:26.18  
+    .  Median :20.50   Median :1.5   Median :81.32   Median :1.669   Median :28.73  
+    .  Mean   :20.50   Mean   :1.5   Mean   :80.75   Mean   :1.686   Mean   :28.62  
+    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:87.91   3rd Qu.:1.747   3rd Qu.:31.87  
+    .  Max.   :40.00   Max.   :2.0   Max.   :98.92   Max.   :1.879   Max.   :37.49  
     .     V_Heart           V_Lung          V_Muscle         V_Skin     
-    .  Min.   :0.2441   Min.   :0.7050   Min.   :16.59   Min.   :1.701  
-    .  1st Qu.:0.2720   1st Qu.:0.8170   1st Qu.:17.74   1st Qu.:2.093  
-    .  Median :0.3048   Median :0.9803   Median :22.36   Median :2.515  
-    .  Mean   :0.3177   Mean   :0.9824   Mean   :23.16   Mean   :2.655  
-    .  3rd Qu.:0.3701   3rd Qu.:1.1598   3rd Qu.:29.02   3rd Qu.:3.282  
-    .  Max.   :0.4039   Max.   :1.2452   Max.   :29.90   Max.   :3.819  
-    .    V_Adipose          V_Bone      
-    .  Min.   : 3.848   Min.   : 7.079  
-    .  1st Qu.:19.559   1st Qu.: 7.698  
-    .  Median :32.371   Median : 8.732  
-    .  Mean   :31.483   Mean   : 9.153  
-    .  3rd Qu.:42.198   3rd Qu.:10.531  
-    .  Max.   :59.287   Max.   :12.288
+    .  Min.   :0.2387   Min.   :0.6741   Min.   :16.64   Min.   :1.603  
+    .  1st Qu.:0.2729   1st Qu.:0.8259   1st Qu.:17.77   1st Qu.:2.114  
+    .  Median :0.3185   Median :1.0128   Median :22.84   Median :2.692  
+    .  Mean   :0.3191   Mean   :0.9841   Mean   :23.26   Mean   :2.669  
+    .  3rd Qu.:0.3684   3rd Qu.:1.1554   3rd Qu.:29.16   3rd Qu.:3.237  
+    .  Max.   :0.4023   Max.   :1.2414   Max.   :29.89   Max.   :3.801  
+    .    V_Adipose         V_Bone      
+    .  Min.   :14.75   Min.   : 6.507  
+    .  1st Qu.:23.84   1st Qu.: 7.684  
+    .  Median :30.89   Median : 9.122  
+    .  Mean   :32.61   Mean   : 9.142  
+    .  3rd Qu.:43.43   3rd Qu.:10.409  
+    .  Max.   :58.30   Max.   :12.340
 
 # Generate drug-specific parameters
 
@@ -197,16 +197,16 @@ summary(df_popPars[,1:11])
 The function `calcKp` can calculate the molecule’s Kp values for
 different organs using one of five different calculation methods:
 
-  - PT: Poulin and Theil
+-   PT: Poulin and Theil
     ([source](https://pubmed.ncbi.nlm.nih.gov/11782904/)).
-  - RR: Rodgers and Rowland
+-   RR: Rodgers and Rowland
     ([source1](https://pubmed.ncbi.nlm.nih.gov/15858854/) and
     [source2](https://pubmed.ncbi.nlm.nih.gov/16639716/)).
-  - Berez: Berezhkovskiy
+-   Berez: Berezhkovskiy
     ([source](https://pubmed.ncbi.nlm.nih.gov/15124219/)).
-  - Schmitt: Schimtt
+-   Schmitt: Schimtt
     ([source](https://pubmed.ncbi.nlm.nih.gov/17981004/)).
-  - pksim: PK-Sim
+-   pksim: PK-Sim
     ([source](https://www.tandfonline.com/doi/abs/10.1517/17425255.1.1.159)).
 
 The function uses the standardized tissue composition database reported
@@ -230,9 +230,8 @@ ggplot(data=df_Kps2, aes(Parameter, Value)) +
   geom_col() + theme_bw()
 ```
 
-![](man/figures/README-calcKp-1.png)<!-- --> \#\# Calculate
-tissue:plasma partition coefficients (Kp) using volume at steady state
-(Vss)
+![](man/figures/README-calcKp-1.png)<!-- --> ## Calculate tissue:plasma
+partition coefficients (Kp) using volume at steady state (Vss)
 
 If Vss is available, it can be passed to the argument `Vss` of the
 `calcKp` function that will then scale the calculated Kp values
@@ -268,8 +267,8 @@ calculate BP based on the methods reported
 [here](https://pubmed.ncbi.nlm.nih.gov/20549836/). There are two methods
 to chose from:
 
-  - Method 1: uses molecule’s fup to calculate BP.
-  - Method 2: uses molecule’s logP (or another measurement of
+-   Method 1: uses molecule’s fup to calculate BP.
+-   Method 2: uses molecule’s logP (or another measurement of
     lipophilicity like logD) to calculate BP.
 
 Note: drug type = “total” is the default type and it uses the regression
