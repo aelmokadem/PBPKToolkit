@@ -4,7 +4,7 @@
 \alias{calcKp_RR}
 \title{Calculate partition coefficients for a molecule based on the Rodgers and Rowland method}
 \usage{
-calcKp_RR(logP, pKa, fup, BP = 1, type = 1, dat)
+calcKp_RR(logP, pKa, fup, BP = 1, type = 1, dat, Ht = 0.45)
 }
 \arguments{
 \item{logP}{Partition coefficient of a molecule between an aqueous and lipophilic phases, usually octanol and water; measurement of lipophilicity}
@@ -18,6 +18,8 @@ calcKp_RR(logP, pKa, fup, BP = 1, type = 1, dat)
 \item{type}{Type of the molecule; 1=neutral, 2=monoprotic acid, 3=monoprotic base, 4=diprotic acid, 5=diprotic base, 6=monoprotic acid monoprotic base (acid comes first), 7=triprotic acid, 8=triprotic base, 9=diprotic acid monoprotic base (first two are acid), 10=diprotic base monoprotic acid (first one is acid)}
 
 \item{dat}{Dataframe containing tissue composition data; columns are: tissue, f_water=water fraction, f_lipids=lipids fraction, f_proteins=protein fraction, f_pl=phospholipids fraction, f_n_l=neutral lipids fraction, f_n_pl=neutral phospholipids fraction, f_a_pl=acidic phospholipids fraction, pH, f_ew=extracellular fraction, f_iw=intracellular fraction, AR=albumin ratio, LR=lipoprotein ratio,  Prediction method; PT=Poulin and Theil, Berez=Berezhkovskiy, RR=Rodgers and Rowland, Schmitt=Schmitt, pksim=PK-Sim standard}
+
+\item{Ht}{Hematocrit value; default is 0.45}
 }
 \value{
 A named list with tissue:plasma partition coefficients
