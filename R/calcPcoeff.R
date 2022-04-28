@@ -293,6 +293,7 @@ calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT", Vss=NULL, Vt=
   #useful error messages
   if(fup > 1) stop("fup should be <= 1")
   test_pKaTypeMatch(type, pKa)
+  test_largeHt(Ht)
 
   if(method == "PT"){
     pcoeff <- calcKp_PT(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
