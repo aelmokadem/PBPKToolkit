@@ -8,6 +8,7 @@
 #' @param out_dir Output directory where the ref cases will be saved
 #' @importFrom magrittr %>%
 #' @importFrom dplyr as_tibble mutate
+#' @importFrom digest digest
 #' @keywords internal
 #' **Meant to be called with `pmap_dfr()`**
 render_ref <- function(..., .func, out_dir) {
@@ -16,10 +17,11 @@ render_ref <- function(..., .func, out_dir) {
   # run the function
   res <- do.call(.func, .row)
   # write the result to a file
-  out_path <- paste(
+  out_name <- paste(
     paste(names(unlist(.row)), unlist(.row), sep = "="),
     collapse = "_"
   )
+  out_path <- digest::digest(out_name, algo = "md5")
 
   out_dir <- file.path(system.file("test-refs", package = "PBPKToolkit"), out_dir)
   if(!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
@@ -29,7 +31,10 @@ render_ref <- function(..., .func, out_dir) {
   .row %>%
     vec_to_list() %>%
     as_tibble() %>%
-    mutate(ref_path = out_path)
+    mutate(
+      ref_name = out_name,
+      ref_path = out_path
+    )
 }
 
 #########################

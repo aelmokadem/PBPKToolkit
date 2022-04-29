@@ -10,6 +10,7 @@ purrr::pwalk(ref_df, ~ {
   # extract reference path from list
   ref_path <- .row$ref_path
   .row$ref_path <- NULL
+  .row$ref_name <- NULL # only for human-readability of test refs
 
   test_that(paste("calcKp works for", ref_path), {
     res <- do.call(calcKp, .row)
