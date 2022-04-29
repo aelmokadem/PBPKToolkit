@@ -12,6 +12,7 @@ RoxygenNote: 7.1.1
 Depends: 
     R (>= 4.0)
 Imports:
+    digest,
     dplyr (>= 1.0),
     magrittr (>= 1.5),
     nloptr,
