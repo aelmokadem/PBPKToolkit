@@ -288,8 +288,9 @@ test_negativeKps <- function(Kps){
 #' @param Ht Hematocrit value
 #' @return An error if Hematocrit > 1
 #' @keywords internal
-test_largeHt <- function(Ht){
-  if(as.numeric(Ht) > 1.0) stop("Hematocrit value cannot be larger than 1")
+test_Ht <- function(Ht, BP=1){
+  if(as.numeric(Ht) > 1.0) stop("Ht cannot be larger than 1")
+  if(as.numeric(BP) < 1.0 & (as.numeric(Ht) + as.numeric(BP)) < 1.0) stop("Chosen Ht and BP values are unrealistic")
 }
 
 ####################
@@ -335,6 +336,8 @@ calcKpot <- function(Kp){
 #' @return A named list of the scaled tissue:plasma partition coefficients
 #' @keywords internal
 scaleKp <- function(Kp, Vss, BP, Vt, Kpot, Ht=0.45){
+  test_Ht(Ht, BP)
+
   nms <- names(Vt[grepl("V", names(Vt))])
   vols <- Vt[nms]
   guNms <- c("Vla_int","Vsm_int","Vst")
