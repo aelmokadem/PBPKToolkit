@@ -169,26 +169,26 @@ summary(df_popPars[,1:11])
 ```
 
     .        ID             SEX            BW              HT             BMI       
-    .  Min.   : 1.00   Min.   :1.0   Min.   :55.47   Min.   :1.511   Min.   :21.23  
-    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:74.44   1st Qu.:1.619   1st Qu.:26.18  
-    .  Median :20.50   Median :1.5   Median :81.32   Median :1.669   Median :28.73  
-    .  Mean   :20.50   Mean   :1.5   Mean   :80.75   Mean   :1.686   Mean   :28.62  
-    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:87.91   3rd Qu.:1.747   3rd Qu.:31.87  
-    .  Max.   :40.00   Max.   :2.0   Max.   :98.92   Max.   :1.879   Max.   :37.49  
+    .  Min.   : 1.00   Min.   :1.0   Min.   :50.38   Min.   :1.502   Min.   :20.11  
+    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.88   1st Qu.:1.610   1st Qu.:25.14  
+    .  Median :20.50   Median :1.5   Median :77.76   Median :1.675   Median :27.96  
+    .  Mean   :20.50   Mean   :1.5   Mean   :78.54   Mean   :1.665   Mean   :28.36  
+    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:89.42   3rd Qu.:1.724   3rd Qu.:31.31  
+    .  Max.   :40.00   Max.   :2.0   Max.   :98.34   Max.   :1.827   Max.   :38.90  
     .     V_Heart           V_Lung          V_Muscle         V_Skin     
-    .  Min.   :0.2387   Min.   :0.6741   Min.   :16.64   Min.   :1.603  
-    .  1st Qu.:0.2729   1st Qu.:0.8259   1st Qu.:17.77   1st Qu.:2.114  
-    .  Median :0.3185   Median :1.0128   Median :22.84   Median :2.692  
-    .  Mean   :0.3191   Mean   :0.9841   Mean   :23.26   Mean   :2.669  
-    .  3rd Qu.:0.3684   3rd Qu.:1.1554   3rd Qu.:29.16   3rd Qu.:3.237  
-    .  Max.   :0.4023   Max.   :1.2414   Max.   :29.89   Max.   :3.801  
-    .    V_Adipose         V_Bone      
-    .  Min.   :14.75   Min.   : 6.507  
-    .  1st Qu.:23.84   1st Qu.: 7.684  
-    .  Median :30.89   Median : 9.122  
-    .  Mean   :32.61   Mean   : 9.142  
-    .  3rd Qu.:43.43   3rd Qu.:10.409  
-    .  Max.   :58.30   Max.   :12.340
+    .  Min.   :0.2338   Min.   :0.6629   Min.   :16.47   Min.   :1.555  
+    .  1st Qu.:0.2596   1st Qu.:0.7606   1st Qu.:17.42   1st Qu.:1.910  
+    .  Median :0.3028   Median :0.9738   Median :22.45   Median :2.480  
+    .  Mean   :0.3101   Mean   :0.9537   Mean   :22.98   Mean   :2.534  
+    .  3rd Qu.:0.3609   3rd Qu.:1.1376   3rd Qu.:28.75   3rd Qu.:3.164  
+    .  Max.   :0.3937   Max.   :1.2199   Max.   :29.81   Max.   :3.622  
+    .    V_Adipose          V_Bone      
+    .  Min.   : 7.665   Min.   : 6.388  
+    .  1st Qu.:24.458   1st Qu.: 7.663  
+    .  Median :32.600   Median : 8.616  
+    .  Mean   :31.393   Mean   : 8.823  
+    .  3rd Qu.:38.113   3rd Qu.:10.150  
+    .  Max.   :55.253   Max.   :11.514
 
 # Generate drug-specific parameters
 
@@ -301,3 +301,14 @@ calcFup(logP = logP)
 ```
 
     . [1] 0.2931778
+
+## Calculate steady state volume of distribution (Vss)
+
+Predict Vss from estimated partition coefficients and tissue volumes.
+
+``` r
+# in case BP parameter was missing, the function calcBP
+calcVss(Kp=Kps, BP=BP, Vt=indPars)
+```
+
+    . [1] 50

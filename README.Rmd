@@ -205,7 +205,7 @@ calcFup(logP = logP)
 
 Predict Vss from estimated partition coefficients and tissue volumes.
 
-```{r, calcFup}
+```{r, calcVss}
 # in case BP parameter was missing, the function calcBP
 calcVss(Kp=Kps, BP=BP, Vt=indPars)
 ```
