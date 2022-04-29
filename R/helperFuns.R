@@ -290,7 +290,7 @@ test_negativeKps <- function(Kps){
 #' @keywords internal
 test_Ht <- function(Ht, BP=1){
   if(as.numeric(Ht) > 1.0) stop("Ht cannot be larger than 1")
-  if(as.numeric(BP) < 1.0 & (as.numeric(Ht) + as.numeric(BP)) < 1.0) stop("Chosen Ht and BP values are unrealistic")
+  if(as.numeric(BP) < 1.0 & (as.numeric(Ht) + as.numeric(BP)) < 1.0) stop("Chosen Ht and BP combination is unrealistic")
 }
 
 ####################
