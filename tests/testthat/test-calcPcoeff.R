@@ -115,3 +115,14 @@ test_that("calcKp_Vss", {
   )
 })
 
+## calcVss
+Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method)
+
+test_that("calcVss", {
+  expect_equal(
+    calcVss(Kp=Kps, BP=BP, Vt=indPars),
+    186.9979,
+    tolerance = 6
+  )
+})
+

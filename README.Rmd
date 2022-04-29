@@ -200,3 +200,12 @@ In case fup parameter was missing, the function `calcFup` can be used to calcula
 # in case BP parameter was missing, the function calcBP
 calcFup(logP = logP)
 ```
+
+## Calculate steady state volume of distribution (Vss)
+
+Predict Vss from estimated partition coefficients and tissue volumes.
+
+```{r, calcFup}
+# in case BP parameter was missing, the function calcBP
+calcVss(Kp=Kps, BP=BP, Vt=indPars)
+```

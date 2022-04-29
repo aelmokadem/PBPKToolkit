@@ -3,6 +3,7 @@
 export(calcBP)
 export(calcFup)
 export(calcKp)
+export(calcVss)
 export(genInd)
 export(genInd_mab)
 export(genPop)
