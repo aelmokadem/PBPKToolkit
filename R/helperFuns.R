@@ -571,11 +571,12 @@ sampleCov <- function(dat, minBW, maxBW, minHT, maxHT, minBMI, maxBMI){
 #' @param optimize if TRUE, an optimization step is done for each individual
 #' @param addBC if TRUE, blood content will be added to each organ
 #' @param mab if TRUE, mAb model physiological parameters are returned
+#' @param method Method to use for generating physiological parameters; choices are "Willmann" and "Huisinga"
 #' @return A probability to be minimized by an optimizer
 #' @importFrom magrittr %>%
 #' @importFrom stats runif
 #' @keywords internal
-sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=FALSE, addBC=TRUE, mab=FALSE){
+sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=FALSE, addBC=TRUE, mab=FALSE, method="Willmann"){
   pars <- rep(list(), nSubj)
 
   vol_test <- NA
@@ -596,7 +597,7 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, m
       t <- try(suppressWarnings(pars[[ind]] <- genInd_mab(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ)), silent = TRUE)  #get the individual parameters
       if(!"try-error" %in% class(t)) vol_test <- pars[[ind]]$V_Liver
     }else{
-      t <- try(suppressWarnings(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize, addBC=addBC)), silent = TRUE)  #get the individual parameters
+      t <- try(suppressWarnings(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize, addBC=addBC, method=method)), silent = TRUE)  #get the individual parameters
       if(!"try-error" %in% class(t)) vol_test <- pars[[ind]]$Vli
     }
 

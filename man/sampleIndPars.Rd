@@ -17,7 +17,8 @@ sampleIndPars(
   maxBMI,
   optimize = FALSE,
   addBC = TRUE,
-  mab = FALSE
+  mab = FALSE,
+  method = "Willmann"
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ sampleIndPars(
 \item{addBC}{if TRUE, blood content will be added to each organ}
 
 \item{mab}{if TRUE, mAb model physiological parameters are returned}
+
+\item{method}{Method to use for generating physiological parameters; choices are "Willmann" and "Huisinga"}
 }
 \value{
 A probability to be minimized by an optimizer

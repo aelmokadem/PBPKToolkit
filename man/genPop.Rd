@@ -16,7 +16,8 @@ genPop(
   minBMI = NULL,
   maxBMI = NULL,
   optimize = FALSE,
-  addBC = TRUE
+  addBC = TRUE,
+  method = "Willmann"
 )
 }
 \arguments{
@@ -40,9 +41,11 @@ genPop(
 
 \item{maxBMI}{Maximum body mass index in kg/m^2}
 
-\item{optimize}{if TRUE, an optimization step is done for each individual}
+\item{optimize}{if TRUE, an optimization step is done; for "Willmann" method}
 
 \item{addBC}{if TRUE, blood content will be added to each organ}
+
+\item{method}{Method to use for generating physiological parameters; choices are "Willmann" and "Huisinga"}
 }
 \value{
 List of named lists with physiological parameters for each individual in the population

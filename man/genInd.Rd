@@ -10,8 +10,11 @@ genInd(
   bw_targ = NULL,
   ht_targ = NULL,
   bmi_targ = NULL,
+  bsa_targ = NULL,
+  lbw_targ = NULL,
   optimize = FALSE,
-  addBC = TRUE
+  addBC = TRUE,
+  method = "Willmann"
 )
 }
 \arguments{
@@ -25,13 +28,22 @@ genInd(
 
 \item{bmi_targ}{Target body mass index in kg/m^2}
 
-\item{optimize}{if TRUE, an optimization step is done}
+\item{bsa_targ}{Target body surface area in m^2; will be used by "Huisinga" method; if missing the value will be calculated from body weight and height}
+
+\item{lbw_targ}{Target lean body weight in kg; will be used by "Huisinga" method; if missing the value will be approximated by fat free mass}
+
+\item{optimize}{if TRUE, an optimization step is done; for "Willmann" method}
 
 \item{addBC}{if TRUE, blood content will be added to each organ}
+
+\item{method}{Method to use for generating physiological parameters; choices are "Willmann" and "Huisinga"}
 }
 \value{
 Named list with physiological parameters for the desired individual
 }
 \description{
 Takes in desired individual demographics and generates the individual physiological parameters
+}
+\details{
+Sources: Willmann: https://pubmed.ncbi.nlm.nih.gov/17431751/, Huisinga: https://ascpt.onlinelibrary.wiley.com/doi/10.1038/psp.2012.3
 }

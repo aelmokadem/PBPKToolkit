@@ -7,9 +7,13 @@
 #' @param bw_targ Target body weight in kg
 #' @param ht_targ Target height in m
 #' @param bmi_targ Target body mass index in kg/m^2
-#' @param optimize if TRUE, an optimization step is done
+#' @param bsa_targ Target body surface area in m^2; will be used by "Huisinga" method; if missing the value will be calculated from body weight and height
+#' @param lbw_targ Target lean body weight in kg; will be used by "Huisinga" method; if missing the value will be approximated by fat free mass
+#' @param optimize if TRUE, an optimization step is done; for "Willmann" method
 #' @param addBC if TRUE, blood content will be added to each organ
+#' @param method Method to use for generating physiological parameters; choices are "Willmann" and "Huisinga"
 #' @return Named list with physiological parameters for the desired individual
+#' @details Sources: Willmann: https://pubmed.ncbi.nlm.nih.gov/17431751/, Huisinga: https://ascpt.onlinelibrary.wiley.com/doi/10.1038/psp.2012.3
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select mutate bind_rows left_join case_when
 #' @importFrom stats approxfun plnorm quantile rnorm runif sd
@@ -19,15 +23,25 @@
 #This function generates the desired individual parameters; using linear interpolaton
 #source is mainly the PK-Sim Github page https://github.com/Open-Systems-Pharmacology/OSPSuite.Documentation/wiki/Create-Individual-Algorithm
 
-genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, optimize=FALSE, addBC=TRUE){
+genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, bsa_targ=NULL, lbw_targ=NULL, optimize=FALSE, addBC=TRUE, method="Willmann"){
   ##filter nhanes database for desired age and sex
   sex <- ifelse(is.male, 1, 2)
 
   test_genIndInput(age, bw_targ, ht_targ, bmi_targ)
 
+  # inputs for lbw ; https://ascpt.onlinelibrary.wiley.com/doi/10.1038/psp.2012.3
+  M_bmi <- 9270.0/216.0
+  K_bmi <-  6680.0/216.0
+  if(sex == 2){
+    M_bmi <- 9270.0/244.0
+    K_bmi <-  6680.0/244.0
+  }
+
   if(!is.null(bw_targ) & !is.null(ht_targ)) bmi_targ <- bw_targ/ht_targ^2
   if(is.null(bw_targ)) bw_targ <- bmi_targ*ht_targ^2
   if(is.null(ht_targ)) ht_targ <- sqrt(bw_targ/bmi_targ)
+  if(is.null(bsa_targ)) bsa_targ <- sqrt(ht_targ*bw_targ/36)
+  if(is.null(lbw_targ)) lbw_targ = (M_bmi/(K_bmi + bmi_targ))*bw_targ  # approximate lbw by fat free mass
 
   refDatasets <- filterDatasets(age, sex)
 
@@ -41,20 +55,34 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   rangeBW <- quantile(dat$BW, c(0.025, 0.975))  #get the 95% range of body weights
   rangeHT <- quantile(dat$HT/100, c(0.025, 0.975))  #get the 95% range of heights
   rangeBMI <- quantile(dat$BMI, c(0.025, 0.975))  #get the 95% range of body mass index
+  rangeBSA <- quantile(dat$BSA, c(0.025, 0.975))  #get the 95% range of body surface area
 
   #check covariate range and throw an error when target measurements are out of range
   test_covRange(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI)
 
   ##get mean bw, ht and bmi
-  bw_mean <- exp(mean(log(dat$BW)))  #geomteric mean for lognormally distributed weights
+  dat$LBW <- (M_bmi/(K_bmi + dat$BMI))*dat$BW
+  bw_mean <- exp(mean(log(dat$BW)))  #geomteric mean for lognormally distributed weights in kg
   ht_mean <- mean(dat$HT)/100  #arithmetic mean for normally distributed heights in m
   bmi_mean <- exp(mean(log(dat$BMI)))  #geomteric mean for lognormally distributed BMI
+  bsa_mean <- mean(dat$BSA)  #arithmetic mean for normally distributed BSA in m^2
+  lbw_mean <- exp(mean(log(dat$LBW)))  #geomteric mean for lognormally distributed lean body weights in kg
 
   ##get mean physiological parameters scaled by linear interpolation with height
   df2 <- df %>% select(-c(bw, ht, bsa))  #get rid of anthropometric measurements
   ht_ref <- df$ht/100  #get reference body heights from ICRP in m
-  linIntFns <- apply(df2, 2, FUN=function(x) approxfun(ht_ref, x, rule=2))  #linear interpolation functions with height; if outside range use closest value
-  physPars <- lapply(linIntFns, FUN=function(x) x(ht_mean))  #get list of mean physiological parameters
+  bw_ref <- df$bw
+  bsa_ref <- df$bsa  # get reference body surface area from ICRP in m^2
+  bmi_ref <- (df$bw)/(df$ht)^2
+  lbw_ref <- df$bw - df$ad
+
+  if(method == "Willmann"){
+    linIntFns <- apply(df2, 2, FUN=function(x) approxfun(ht_ref, x, rule=2))  #linear interpolation functions with height; if outside range use closest value
+    physPars <- lapply(linIntFns, FUN=function(x) x(ht_mean))  #get list of mean physiological parameters
+  }else if(method == "Huisinga"){
+    linIntFns <- apply(df2, 2, FUN=function(x) approxfun(lbw_ref, x, rule=2))  #linear interpolation functions with lean body weight; if outside range use closest value
+    physPars <- lapply(linIntFns, FUN=function(x) x(lbw_mean))  #get list of mean physiological parameters
+  }
 
   blVol <- physPars$bl  #extract blood volume
 
@@ -77,66 +105,114 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
   }
   df_temp <- bind_rows(df_vols %>% select(organ, means), df_co)  #join with co again
 
-  normOrgan <- normSD$organ
-  lnormOrgan <- lnormSD$organ
-  df_norm <- df_temp %>% filter(organ %in% normOrgan)  #prepare a df for normally distributed organs
-  df_norm <- left_join(df_norm, normSD, by="organ")  #integrate with stds
-  df_norm <- df_norm %>% mutate(std = cv*means/100) %>% select(-cv)  #get standard deviations from CVs then drop it
-  df_lnorm <- df_temp %>% filter(organ %in% lnormOrgan)  #prepare a df for lognormally distributed organs
-  df_lnorm <- left_join(df_lnorm, lnormSD, by="organ")  #integrate with stds
-  names(df_lnorm)[names(df_lnorm) == "geomSD"] <- "std"  #change geomSD to std
-  df3 <- bind_rows(df_norm, df_lnorm)  #get combined dataframe for normally and lognormally distributed organs
+  #--# Willmann #--#
 
-  ##scaling of physiological parameters
-  ht_rel <- ht_targ/ht_mean  #get relative height ratio
-  SF2 <- bind_rows(SF, data.frame(organ="co", factor=0.75))  #add allometric scaling factor for cardiac output
-  df3 <- left_join(df3, SF2, by=("organ"))  #integrate allometric scaling factors
-  df3 <- df3 %>% mutate(means_scaled = ifelse(organ %in% normOrgan, means*ht_rel^factor, means + log(ht_rel^factor)))  #get scaled mean values
-  df3 <- df3 %>% mutate(std_scaled = ifelse(organ %in% normOrgan, std*ht_rel^factor, std))  #get scaled standard deviations
-  df4 <- df3 %>% filter(organ != "co")  #remove cardiac output
+  if(method == "Willmann"){
+    normOrgan <- normSD$organ
+    lnormOrgan <- lnormSD$organ
+    df_norm <- df_temp %>% filter(organ %in% normOrgan)  #prepare a df for normally distributed organs
+    df_norm <- left_join(df_norm, normSD, by="organ")  #integrate with stds
+    df_norm <- df_norm %>% mutate(std = cv*means/100) %>% select(-cv)  #get standard deviations from CVs then drop it
+    df_lnorm <- df_temp %>% filter(organ %in% lnormOrgan)  #prepare a df for lognormally distributed organs
+    df_lnorm <- left_join(df_lnorm, lnormSD, by="organ")  #integrate with stds
+    names(df_lnorm)[names(df_lnorm) == "geomSD"] <- "std"  #change geomSD to std
+    df3 <- bind_rows(df_norm, df_lnorm)  #get combined dataframe for normally and lognormally distributed organs
 
-  ######################### optimization of organ volumes #################################
-  #set initial values for volumes
-  df_opt <- df4 %>% filter(organ != "ad")
-  df_ad <- df4 %>% filter(organ == "ad")
+    ##scaling of physiological parameters
+    ht_rel <- ht_targ/ht_mean  #get relative height ratio
+    SF2 <- bind_rows(SF, data.frame(organ="co", factor=0.75))  #add allometric scaling factor for cardiac output
+    df3 <- left_join(df3, SF2, by=("organ"))  #integrate allometric scaling factors
+    df3 <- df3 %>% mutate(means_scaled = ifelse(organ %in% normOrgan, means*ht_rel^factor, means + log(ht_rel^factor)))  #get scaled mean values
+    df3 <- df3 %>% mutate(std_scaled = ifelse(organ %in% normOrgan, std*ht_rel^factor, std))  #get scaled standard deviations
+    df4 <- df3 %>% filter(organ != "co")  #remove cardiac output
 
-  pert <- runif(1)  #perturbation to parameters
-  df_opt <- df_opt %>% mutate(pertMeans = ifelse(organ %in% normOrgan,
-                                                        means_scaled + std_scaled*pert,
-                                                        means_scaled*exp(log(std_scaled)*pert))) %>%
-    mutate(pertMeans = ifelse(organ == "sk", pertMeans*sqrt((bw_targ/(bw_mean*ht_rel^2))), pertMeans))
-  ad <- bw_targ - sum(df_opt$pertMeans) #compute adipose volume by subtracting current weight from target bw_targ
+    ######################### optimization of organ volumes #################################
+    #set initial values for volumes
+    df_opt <- df4 %>% filter(organ != "ad")
+    df_ad <- df4 %>% filter(organ == "ad")
 
-  optVols <- df_opt$pertMeans  #initial parameter values
+    pert <- runif(1)  #perturbation to parameters
+    df_opt <- df_opt %>% mutate(pertMeans = ifelse(organ %in% normOrgan,
+                                                   means_scaled + std_scaled*pert,
+                                                   means_scaled*exp(log(std_scaled)*pert))) %>%
+      mutate(pertMeans = ifelse(organ == "sk", pertMeans*sqrt((bw_targ/(bw_mean*ht_rel^2))), pertMeans))
+    ad <- bw_targ - sum(df_opt$pertMeans) #compute adipose volume by subtracting current weight from target bw_targ
 
-  if(optimize){
-    optMod <- suppressWarnings(newuoa(optVols, optimVolsFunc, df_opt=df_opt, df_ad=df_ad, bw_targ=bw_targ, bw_mean=bw_mean, ht_rel=ht_rel, normOrgan=normOrgan))
-    df_opt <- df_opt %>% mutate(optimized=optMod$par)
-  }else{
-    df_opt <- df_opt %>% mutate(optimized=means_scaled)
+    optVols <- df_opt$pertMeans  #initial parameter values
+
+    if(optimize){
+      optMod <- suppressWarnings(newuoa(optVols, optimVolsFunc, df_opt=df_opt, df_ad=df_ad, bw_targ=bw_targ, bw_mean=bw_mean, ht_rel=ht_rel, normOrgan=normOrgan))
+      df_opt <- df_opt %>% mutate(optimized=optMod$par)
+    }else{
+      df_opt <- df_opt %>% mutate(optimized=means_scaled)
+    }
+
+    ad <- bw_targ - sum(df_opt$optimized)
+
+    v_ov <- c(df_opt$optimized, ad)
+
+    l_ov <- as.list(v_ov)  #get the final scaled organ volumes in a list
+    names(l_ov) <- paste("V", c(as.character(df_opt$organ), "ad"), sep="")  #name the list
+
+
+    ################################# getting organ blood flows #####################################
+    co <- df3$means_scaled[df3$organ == "co"]
+    flow2 <- flow %>% dplyr::mutate(bfs = (flowPerc*co/100)*60) %>% dplyr::filter(!organ %in% c("ve","ar","lu","li")) #get flow rates in L/h and remove lungs, liver, arterial and venous blood flows as they will be calculated within the model
+    flow2 <- flow2 %>%
+      dplyr::mutate(sds = 0.05*bfs,
+                    bfs2 = rnorm(nrow(flow2), mean=bfs, sd=sds))
+    l_bf <- as.list(flow2$bfs2)  #list of blood flows
+    names(l_bf) <- paste("Q", flow2$organ, sep="")  #name the list
+    flow_li <- flow2 %>% filter(organ %in% c("st","sm_int","la_int","sp","pa","ha"))
+    l_bf <- c(l_bf, Qli=sum(flow_li$bfs2), Qlu=sum(flow2$bfs2))
+
+#--# Huisinga #--#
+
+  }else if(method == "Huisinga"){
+    scale_ad <- (bw_targ - lbw_targ) / (bw_mean - lbw_mean)
+    scale_br <- 1
+    scale_sk <- bsa_targ/bsa_mean
+    w_br <- scale_br*df_temp$means[df_temp$organ == "br"]
+    w_sk <- scale_sk*df_temp$means[df_temp$organ == "sk"]
+    w_ad <- scale_ad*df_temp$means[df_temp$organ == "ad"]
+    scale_ti <- (lbw_targ - w_br - w_sk) / (lbw_mean - df_temp$means[df_temp$organ == "br"] - df_temp$means[df_temp$organ == "sk"])
+
+    df_temp$density <- 1
+    df_temp2 <- df_temp %>% mutate(density = case_when(organ == "ad" ~ 0.92,
+                                                       organ == "bo" ~ 1.3,
+                                                       TRUE ~ density)) %>%
+      mutate(wts = case_when(organ == "br" ~ w_br,
+                              organ == "sk" ~ w_sk,
+                              organ == "ad" ~ w_ad,
+                              TRUE ~ scale_ti*means))
+
+    # organ volumes #
+    df_vols_tmp <- df_temp2 %>% filter(!organ %in% c("ot","co"))
+    df_co <- df_temp2 %>% filter(organ == "co")
+
+    wt_ot <- bw_targ - sum(df_vols_tmp$wts)
+
+    df_vols <- df_temp2 %>%
+      mutate(wts = ifelse(organ == "ot", wt_ot, wts),
+             vols = wts/density) %>%
+      filter(organ != "co")
+
+    v_ov <- df_vols$vols
+
+    l_ov <- as.list(v_ov)  #get the final scaled organ volumes in a list
+    names(l_ov) <- paste("V", as.character(df_vols$organ), sep="")  #name the list
+
+    # organ flows
+    co <- df_co$wts
+    flow2 <- flow %>% dplyr::mutate(bfs = (flowPerc*co/100)*60) %>% dplyr::filter(!organ %in% c("ve","ar","lu","li")) #get flow rates in L/h and remove lungs, liver, arterial and venous blood flows as they will be calculated within the model
+    l_bf <- as.list(flow2$bfs)  #list of blood flows
+    names(l_bf) <- paste("Q", flow2$organ, sep="")  #name the list
+    flow_li <- flow2 %>% filter(organ %in% c("st","sm_int","la_int","sp","pa","ha"))
+    l_bf <- c(l_bf, Qli=sum(flow_li$bfs), Qlu=sum(flow2$bfs))
   }
 
-  ad <- bw_targ - sum(df_opt$optimized)
-
-  v_ov <- c(df_opt$optimized, ad)
-
-  l_ov <- as.list(v_ov)  #get the final scaled organ volumes in a list
-  names(l_ov) <- paste("V", c(as.character(df_opt$organ), "ad"), sep="")  #name the list
-
-
-  ################################# getting organ blood flows #####################################
-  co <- df3$means_scaled[df3$organ == "co"]
-  flow2 <- flow %>% dplyr::mutate(bfs = (flowPerc*co/100)*60) %>% dplyr::filter(!organ %in% c("ve","ar","lu","li")) #get flow rates in L/h and remove lungs, liver, arterial and venous blood flows as they will be calculated within the model
-  flow2 <- flow2 %>%
-    dplyr::mutate(sds = 0.05*bfs,
-                  bfs2 = rnorm(nrow(flow2), mean=bfs, sd=sds))
-  l_bf <- as.list(flow2$bfs2)  #list of blood flows
-  names(l_bf) <- paste("Q", flow2$organ, sep="")  #name the list
-  flow_li <- flow2 %>% filter(organ %in% c("st","sm_int","la_int","sp","pa","ha"))
-  l_bf <- c(l_bf, Qli=sum(flow_li$bfs2), Qlu=sum(flow2$bfs2))
-
   ##getting final parameter list
-  pars <- c(AGE=age, SEX=sex, BW=bw_targ, HT=ht_targ, BMI=bmi_targ, l_ov, l_bf)
+  pars <- c(AGE=age, SEX=sex, BW=bw_targ, HT=ht_targ, BMI=bmi_targ, BSA=bsa_targ, LBW=lbw_targ, l_ov, l_bf)
 }
 
 
@@ -156,11 +232,12 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, opti
 #' @param maxHT Maximum height in m
 #' @param minBMI Minimum body mass index in kg/m^2
 #' @param maxBMI Maximum body mass index in kg/m^2
-#' @param optimize if TRUE, an optimization step is done for each individual
+#' @param optimize if TRUE, an optimization step is done; for "Willmann" method
 #' @param addBC if TRUE, blood content will be added to each organ
-#' @return List of named lists with physiological parameters for each individual in the population
+#' @param method Method to use for generating physiological parameters; choices are "Willmann" and "Huisinga"
+##' @return List of named lists with physiological parameters for each individual in the population
 #' @export
-genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=FALSE, addBC=TRUE){
+genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, minHT = NULL, maxHT = NULL, minBMI = NULL, maxBMI = NULL, optimize=FALSE, addBC=TRUE, method="Willmann"){
   ##age is in years; weight is in kg; height is in m
 
   test_genPopInput(minBW, maxBW, minHT, maxHT, minBMI, maxBMI)
@@ -168,8 +245,8 @@ genPop <- function(nSubj, minAge, maxAge, femPerc, minBW = NULL, maxBW = NULL, m
   nFemale <- floor((femPerc/100)*nSubj)
   nMale <- nSubj-nFemale
 
-  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC, mab=FALSE)
-  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC, mab=FALSE)
+  pars_m <- sampleIndPars(nSubj=nMale, minAge, maxAge, is.male=TRUE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC, mab=FALSE, method=method)
+  pars_f <- sampleIndPars(nSubj=nFemale, minAge, maxAge, is.male=FALSE, minBW, maxBW, minHT, maxHT, minBMI, maxBMI, optimize=optimize, addBC=addBC, mab=FALSE, method=method)
 
   pars <- c(pars_m, pars_f)
 
