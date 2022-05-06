@@ -293,7 +293,7 @@ calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT", Vss=NULL, Vt=
   #useful error messages
   if(fup > 1) stop("fup should be <= 1")
   test_pKaTypeMatch(type, pKa)
-  test_Ht(Ht, BP=BP)
+  test_Ht(Ht=Ht, BP=BP)
 
   if(method == "PT"){
     pcoeff <- calcKp_PT(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, dat=TCData)
@@ -333,7 +333,7 @@ calcKp <- function(logP, pKa=NULL, fup, BP=1, type=1, method="PT", Vss=NULL, Vt=
 #' @export
 calcBP <- function(logP=NULL, fup, type="total", method=1, Ht=0.45){
   test_calcBPInput(logP, fup, method)
-  test_Ht(Ht)
+  test_Ht(Ht=Ht)
 
   interceptSlope <- getInterceptSlope(type=type, method=method, func="calcBP")
   intercept <- interceptSlope$intercept
