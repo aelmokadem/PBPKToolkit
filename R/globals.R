@@ -44,4 +44,6 @@ utils::globalVariables(c("AGE_YR",
                          "plas",
                          "plas2",
                          "total",
-                         "value"))
+                         "value",
+                         "wts",
+                         "density"))
