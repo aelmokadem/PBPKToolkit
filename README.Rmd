@@ -4,7 +4,7 @@ output: github_document
 
 # PBPKToolkit
 
-PBPKToolkit is an open-source R package that provides a set of functions to be used for PBPK modeling. The functions mainly generate drug- and system-specific parameters required to build a PBPK model. 
+PBPKToolkit is an open-source R package that provides a set of functions to be used for PBPK modeling. The functions mainly generate drug- and system-specific parameters required to build a PBPK model. The package is still in early stages of development so submitting any issues would be greatly appreciated to help improve it. This package does not belong to any organization. 
 
 # Load libraries
 

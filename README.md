@@ -3,7 +3,10 @@
 
 PBPKToolkit is an open-source R package that provides a set of functions
 to be used for PBPK modeling. The functions mainly generate drug- and
-system-specific parameters required to build a PBPK model.
+system-specific parameters required to build a PBPK model. The package
+is still in early stages of development so submitting any issues would
+be greatly appreciated to help improve it. This package does not belong
+to any organization.
 
 # Load libraries
 
@@ -169,26 +172,26 @@ summary(df_popPars[,1:11])
 ```
 
     .        ID             SEX            BW              HT             BMI       
-    .  Min.   : 1.00   Min.   :1.0   Min.   :50.38   Min.   :1.502   Min.   :20.11  
-    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:69.88   1st Qu.:1.610   1st Qu.:25.14  
-    .  Median :20.50   Median :1.5   Median :77.76   Median :1.675   Median :27.96  
-    .  Mean   :20.50   Mean   :1.5   Mean   :78.54   Mean   :1.665   Mean   :28.36  
-    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:89.42   3rd Qu.:1.724   3rd Qu.:31.31  
-    .  Max.   :40.00   Max.   :2.0   Max.   :98.34   Max.   :1.827   Max.   :38.90  
+    .  Min.   : 1.00   Min.   :1.0   Min.   :52.52   Min.   :1.511   Min.   :20.89  
+    .  1st Qu.:10.75   1st Qu.:1.0   1st Qu.:66.56   1st Qu.:1.592   1st Qu.:23.37  
+    .  Median :20.50   Median :1.5   Median :76.31   Median :1.668   Median :26.78  
+    .  Mean   :20.50   Mean   :1.5   Mean   :77.14   Mean   :1.673   Mean   :27.67  
+    .  3rd Qu.:30.25   3rd Qu.:2.0   3rd Qu.:89.27   3rd Qu.:1.726   3rd Qu.:32.08  
+    .  Max.   :40.00   Max.   :2.0   Max.   :99.87   Max.   :1.873   Max.   :41.53  
     .     V_Heart           V_Lung          V_Muscle         V_Skin     
-    .  Min.   :0.2338   Min.   :0.6629   Min.   :16.47   Min.   :1.555  
-    .  1st Qu.:0.2596   1st Qu.:0.7606   1st Qu.:17.42   1st Qu.:1.910  
-    .  Median :0.3028   Median :0.9738   Median :22.45   Median :2.480  
-    .  Mean   :0.3101   Mean   :0.9537   Mean   :22.98   Mean   :2.534  
-    .  3rd Qu.:0.3609   3rd Qu.:1.1376   3rd Qu.:28.75   3rd Qu.:3.164  
-    .  Max.   :0.3937   Max.   :1.2199   Max.   :29.81   Max.   :3.622  
-    .    V_Adipose          V_Bone      
-    .  Min.   : 7.665   Min.   : 6.388  
-    .  1st Qu.:24.458   1st Qu.: 7.663  
-    .  Median :32.600   Median : 8.616  
-    .  Mean   :31.393   Mean   : 8.823  
-    .  3rd Qu.:38.113   3rd Qu.:10.150  
-    .  Max.   :55.253   Max.   :11.514
+    .  Min.   :0.2322   Min.   :0.6780   Min.   :15.86   Min.   :1.579  
+    .  1st Qu.:0.2617   1st Qu.:0.7626   1st Qu.:17.57   1st Qu.:1.928  
+    .  Median :0.3000   Median :0.9723   Median :22.00   Median :2.488  
+    .  Mean   :0.3145   Mean   :0.9639   Mean   :23.18   Mean   :2.591  
+    .  3rd Qu.:0.3750   3rd Qu.:1.1717   3rd Qu.:29.17   3rd Qu.:3.310  
+    .  Max.   :0.4037   Max.   :1.2449   Max.   :29.90   Max.   :3.817  
+    .    V_Adipose         V_Bone      
+    .  Min.   : 7.77   Min.   : 6.529  
+    .  1st Qu.:18.02   1st Qu.: 7.369  
+    .  Median :30.30   Median : 8.558  
+    .  Mean   :29.49   Mean   : 8.964  
+    .  3rd Qu.:37.91   3rd Qu.:10.364  
+    .  Max.   :60.65   Max.   :12.278
 
 # Generate drug-specific parameters
 
