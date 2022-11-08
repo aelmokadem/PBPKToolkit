@@ -410,6 +410,7 @@ test_covRange <- function(bw_targ, ht_targ, bmi_targ, rangeBW, rangeHT, rangeBMI
 #'
 #' Takes in the target covariates and returns an error or a warning if inputs to genInd are not compliant
 #'
+#' @param age Age of the individual in years
 #' @param bw_targ Target body weight in kg
 #' @param ht_targ Target height in m
 #' @param bmi_targ Target BMI in kg/m^2

@@ -66,22 +66,27 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, bsa_
   ht_mean <- mean(dat$HT)/100  #arithmetic mean for normally distributed heights in m
   bmi_mean <- exp(mean(log(dat$BMI)))  #geomteric mean for lognormally distributed BMI
   bsa_mean <- mean(dat$BSA)  #arithmetic mean for normally distributed BSA in m^2
-  lbw_mean <- exp(mean(log(dat$LBW)))  #geomteric mean for lognormally distributed lean body weights in kg
+  lbw_mean <- (M_bmi/(K_bmi + bmi_mean))*bw_mean  #exp(mean(log(dat$LBW)))  #geomteric mean for lognormally distributed lean body weights in kg
 
   ##get mean physiological parameters scaled by linear interpolation with height
   df2 <- df %>% select(-c(bw, ht, bsa))  #get rid of anthropometric measurements
-  ht_ref <- df$ht/100  #get reference body heights from ICRP in m
-  bw_ref <- df$bw
-  bsa_ref <- df$bsa  # get reference body surface area from ICRP in m^2
-  bmi_ref <- (df$bw)/(df$ht)^2
-  lbw_ref <- df$bw - df$ad
+  ht_refs <- df$ht/100  #get reference body heights from ICRP in m
+  bw_refs <- df$bw
+  bsa_refs <- df$bsa  # get reference body surface area from ICRP in m^2
+  bmi_refs <- (df$bw)/(df$ht)^2
+  lbw_refs <- df$bw - df$ad
 
   if(method == "Willmann"){
-    linIntFns <- apply(df2, 2, FUN=function(x) approxfun(ht_ref, x, rule=2))  #linear interpolation functions with height; if outside range use closest value
+    linIntFns <- apply(df2, 2, FUN=function(x) approxfun(ht_refs, x, rule=2))  #linear interpolation functions with height; if outside range use closest value
     physPars <- lapply(linIntFns, FUN=function(x) x(ht_mean))  #get list of mean physiological parameters
   }else if(method == "Huisinga"){
-    linIntFns <- apply(df2, 2, FUN=function(x) approxfun(lbw_ref, x, rule=2))  #linear interpolation functions with lean body weight; if outside range use closest value
-    physPars <- lapply(linIntFns, FUN=function(x) x(lbw_mean))  #get list of mean physiological parameters
+    ages <- icrpData$age
+    linIntFns <- apply(df, 2, FUN=function(x) approxfun(ages, x, rule=2))  #linear interpolation functions with lean body weight; if outside range use closest value; used df as we need ref covariates
+    physPars <- lapply(linIntFns, FUN=function(x) x(age))  #get list of mean physiological parameters
+    bw_ref <- physPars$bw
+    lbw_ref <- bw_ref - physPars$ad
+    bsa_ref <- physPars$bsa
+    physPars <- physPars[4:length(physPars)]
   }
 
   blVol <- physPars$bl  #extract blood volume
@@ -169,13 +174,13 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, bsa_
 #--# Huisinga #--#
 
   }else if(method == "Huisinga"){
-    scale_ad <- (bw_targ - lbw_targ) / (bw_mean - lbw_mean)
+    scale_ad <- (bw_targ - lbw_targ) / (bw_ref - lbw_ref)
     scale_br <- 1
-    scale_sk <- bsa_targ/bsa_mean
+    scale_sk <- bsa_targ/bsa_ref
     w_br <- scale_br*df_temp$means[df_temp$organ == "br"]
     w_sk <- scale_sk*df_temp$means[df_temp$organ == "sk"]
     w_ad <- scale_ad*df_temp$means[df_temp$organ == "ad"]
-    scale_ti <- (lbw_targ - w_br - w_sk) / (lbw_mean - df_temp$means[df_temp$organ == "br"] - df_temp$means[df_temp$organ == "sk"])
+    scale_ti <- (lbw_targ - w_br - w_sk) / (lbw_ref - df_temp$means[df_temp$organ == "br"] - df_temp$means[df_temp$organ == "sk"])
 
     df_temp$density <- 1
     df_temp2 <- df_temp %>% mutate(density = case_when(organ == "ad" ~ 0.92,
@@ -187,10 +192,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, bsa_
                               TRUE ~ scale_ti*means))
 
     # organ volumes #
-    df_vols_tmp <- df_temp2 %>% filter(!organ %in% c("ot","co"))
     df_co <- df_temp2 %>% filter(organ == "co")
-
-    wt_ot <- bw_targ - sum(df_vols_tmp$wts)
 
     df_vols <- df_temp2 %>%
       mutate(wts = ifelse(organ == "ot", wt_ot, wts),

@@ -7,6 +7,8 @@
 test_genIndInput(age, bw_targ, ht_targ, bmi_targ)
 }
 \arguments{
+\item{age}{Age of the individual in years}
+
 \item{bw_targ}{Target body weight in kg}
 
 \item{ht_targ}{Target height in m}

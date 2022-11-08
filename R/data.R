@@ -212,7 +212,8 @@ NULL
 #' @details Prefix: V=volume, Q=flow
 #' @details Abbreviation: bo=bone, br=brain, go=gonads, he=heart, ki=kidneys, la_int=large intestines, li=liver, pa=pancreas, sk=skin, sm_int=small intestines, st=stomach, th=thymus, ln=lymph nodes, ot=other, ve=venous, ar=arterial, lu=lungs, mu=muscle, sp=spleen, ad=adipose, ha=hepatic artery
 #' @name virtPop_gen
-"virtPop_gen"
+#' @keywords internal
+NULL
 
 #' Virtual population for the monoclonal antibody PBPK model
 #'
@@ -232,5 +233,6 @@ NULL
 #' @details Suffix: V=plasma volume, IS=interstitial volume
 #' @details Abbreviation: LI=large intestines, SI=small intestines
 #' @name virtPop_mab
-"virtPop_mab"
+#' @keywords internal
+NULL
 
