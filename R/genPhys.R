@@ -195,8 +195,7 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, bsa_
     df_co <- df_temp2 %>% filter(organ == "co")
 
     df_vols <- df_temp2 %>%
-      mutate(wts = ifelse(organ == "ot", wt_ot, wts),
-             vols = wts/density) %>%
+      mutate(vols = wts/density) %>%
       filter(organ != "co")
 
     v_ov <- df_vols$vols
