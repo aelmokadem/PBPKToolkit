@@ -51,7 +51,7 @@ ht <- 1.76
 # generate individual physiological parameters
 
 ## Willmann
-indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FALSE, method="Willmann")
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = TRUE, method="Willmann")
 df_indPars <- bind_rows(indPars) %>% select(contains(c("Q","V")))
 df_indPars2 <- tibble(Parameter=names(df_indPars), Value=as.numeric(df_indPars))
 
@@ -95,7 +95,7 @@ maxHT <- 1.9  #maximum height
 # generate population physiological parameters
 
 ## Willmann
-popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, optimize = FALSE)
+popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, optimize = TRUE)
 df_popPars <- bind_rows(popPars) %>% select(ID, everything())
 
 df_popPars <- bind_rows(popPars) %>%
@@ -224,7 +224,7 @@ If Vss is available, it can be passed to the argument `Vss` of the `calcKp` func
 ```{r, calcKp2}
 # calculate partition coefficients
 Vss <- 50
-indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = FALSE)
+indPars <- genInd(age=age, is.male=ismale, bw_targ=bw, ht_targ=ht, optimize = TRUE)
 Kps <- calcKp(logP=logP, pKa=pKa, fup=fup, BP=BP, type=type, method=method, Vss=Vss, Vt=indPars)
 df_Kps <- bind_rows(Kps)
 df_Kps2 <- tibble(Parameter=names(df_Kps), Value=as.numeric(Kps))
