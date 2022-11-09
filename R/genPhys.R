@@ -154,6 +154,8 @@ genInd <- function(age, is.male, bw_targ=NULL, ht_targ=NULL, bmi_targ=NULL, bsa_
 
     ad <- bw_targ - sum(df_opt$optimized)
 
+    test_realisticInd(ad)
+
     v_ov <- c(df_opt$optimized, ad)
 
     l_ov <- as.list(v_ov)  #get the final scaled organ volumes in a list

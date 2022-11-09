@@ -581,6 +581,7 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, m
   pars <- rep(list(), nSubj)
 
   vol_test <- NA
+  ad_test <- NA
   ind <- 1
   counter <- 1
   while(ind <= nSubj & counter <= 100){
@@ -599,19 +600,46 @@ sampleIndPars <- function(nSubj, minAge, maxAge, is.male, minBW, maxBW, minHT, m
       if(!"try-error" %in% class(t)) vol_test <- pars[[ind]]$V_Liver
     }else{
       t <- try(suppressWarnings(pars[[ind]] <- genInd(age=age, is.male=is.male, bw_targ=bw_targ, ht_targ=ht_targ, bmi_targ=bmi_targ, optimize=optimize, addBC=addBC, method=method)), silent = TRUE)  #get the individual parameters
-      if(!"try-error" %in% class(t)) vol_test <- pars[[ind]]$Vli
+      if(!"try-error" %in% class(t)){
+        vol_test <- pars[[ind]]$Vli
+        ad_test <- pars[[ind]]$Vad
+      }
     }
 
-    if("try-error" %in% class(t) | is.na(vol_test)){
-      counter <- counter + 1
+    if(mab){
+      if("try-error" %in% class(t) | is.na(vol_test)){
+        counter <- counter + 1
+      }else{
+        ind <- ind + 1
+        counter <- 1
+        vol_test <- NA
+      }
     }else{
-      ind <- ind + 1
-      counter <- 1
-      vol_test <- NA
+      if("try-error" %in% class(t) | is.na(vol_test) | ad_test <= 0){
+        counter <- counter + 1
+      }else{
+        ind <- ind + 1
+        counter <- 1
+        vol_test <- NA
+        ad_test <- NA
+      }
     }
     if(counter == 100) stop("No generated physiological parameters after 100 iterations. Consider modifying input parameters")
   }
   return(pars)
+}
+
+######################################
+
+#' Test if generated individual is realistic
+#'
+#' Takes in the adipose tissue volume and returns an error if value is negative or NA
+#'
+#' @param ad adipose tissue volume
+#' @return An error if unrealistic individual
+#' @keywords internal
+test_realisticInd <- function(ad){
+  if(is.na(ad) || ad <= 0) stop("Unrealistic individual generated. Consider modifying input parameters")
 }
 
 ######################################
