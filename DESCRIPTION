@@ -8,7 +8,7 @@ Description: Helper Functions for PBPK Modeling.
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Depends: 
     R (>= 4.0)
 Imports:
@@ -17,13 +17,13 @@ Imports:
     magrittr (>= 1.5),
     nloptr,
     truncnorm,
-    fs,
-    purrr
+    fs
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
     ggplot2,
     cowplot,
-    GGally
+    GGally,
+    purrr
 Config/testthat/edition: 3
