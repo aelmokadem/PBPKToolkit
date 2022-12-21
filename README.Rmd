@@ -94,7 +94,7 @@ maxHT <- 1.9  #maximum height
 
 # generate population physiological parameters
 
-## Willmann
+## Willmann ; warning: this line would take a few minutes to run
 popPars <- genPop(nSubj=nSubj, minAge=minAge, maxAge=maxAge, femPerc=femPerc, minBW=minBW, maxBW=maxBW, minHT=minHT, maxHT=maxHT, optimize = TRUE)
 df_popPars <- bind_rows(popPars) %>% select(ID, everything())
 
