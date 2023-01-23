@@ -86,7 +86,7 @@ calcKp_RR <- function(logP, pKa, fup, BP=1, type=1, dat, Ht=0.45){
   Ka <- 10^(-pKa)
 
   #Calculate Kp values
-  Kpu_bc <- (Ht - 1 + BP)/(Ht)
+  Kpu_bc <- (Ht - 1 + BP)/(Ht*fup)
 
   XYZ <- getXYZ(type, pKa, pH_IW, pH_P, pH_RBC)
   X <- XYZ$X
